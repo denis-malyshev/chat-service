@@ -1,16 +1,12 @@
 package com.teamdev.chat.persistence.dom;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String firstName;
@@ -18,9 +14,7 @@ public class User {
     private String password;
 
     private String token;
-    @OneToMany
     private List<Message> messages = new ArrayList<>();
-    @OneToMany
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
     public User() {

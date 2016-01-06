@@ -1,7 +1,7 @@
 package com.teamdev.integration.tests;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.teamdev.utils.ChatUtils;
 import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -20,10 +20,10 @@ import static org.junit.Assert.assertEquals;
 
 public class IntegrationTest {
 
-    CloseableHttpClient httpClient;
-    HttpGet request;
-    String validTokenKey;
-    final long validUserId = 1;
+    private CloseableHttpClient httpClient;
+    private HttpGet request;
+    private String validTokenKey;
+    private static final long validUserId = 1;
 
     @Before
     public void setUp() throws Exception {
@@ -40,7 +40,7 @@ public class IntegrationTest {
 
         String json = contentToString(response);
 
-        Set<ChatRoomDTO> chatRoomDTOs = fromJson(json);
+        Set<ChatRoomDTO> chatRoomDTOs = ChatUtils.fromJson(json, new TypeToken<Set<ChatRoomDTO>>(){}.getType());
 
         int result = chatRoomDTOs.size();
 
@@ -66,11 +66,5 @@ public class IntegrationTest {
             e.printStackTrace();
         }
         return new String(bytes);
-    }
-
-    private Set<ChatRoomDTO> fromJson(String json) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, new TypeToken<Set<ChatRoomDTO>>() {
-        }.getType());
     }
 }

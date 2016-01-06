@@ -1,12 +1,12 @@
 package com.teamdev.web;
 
-import com.google.gson.Gson;
+import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.exception.*;
+import com.teamdev.utils.ChatUtils;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.ChatRoomService;
 import com.teamdev.chat.service.MessageService;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.dto.*;
-import com.teamdev.chat.service.impl.exception.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,12 +55,9 @@ public class TestServlet extends HttpServlet {
         UserId userId = new UserId(Long.parseLong(parameterMap.get("userId")[0]));
 
         UserService userService = beanProvider.getBean(UserService.class);
-
         Set<ChatRoomDTO> availableChats = userService.findAvailableChats(userId);
 
-        String json = toJson(availableChats);
-
-        printWriter.write(json);
+        printWriter.write(ChatUtils.toJson(availableChats));
     }
 
     private void generateSampleData() throws AuthenticationException, ChatRoomAlreadyExistsException, UserNotFoundException, ChatRoomNotFoundException, RegistrationException {
@@ -87,11 +83,5 @@ public class TestServlet extends HttpServlet {
         MessageService messageService = beanProvider.getBean(MessageService.class);
 
         messageService.sendPrivateMessage(token1, id1, id2, "Hello, Masha!");
-    }
-
-    private String toJson(Collection<ChatRoomDTO> chatRoomDTOs) {
-
-        Gson gson = new Gson();
-        return gson.toJson(chatRoomDTOs);
     }
 }

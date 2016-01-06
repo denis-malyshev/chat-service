@@ -29,7 +29,6 @@ public class UserServiceTest {
 
     @Before
     public void setUp() throws Exception {
-
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
 
         userService = context.getBean(UserService.class);
@@ -38,24 +37,27 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testRegistrationUser() throws Exception {
+    public void testRegistrationUser() {
+        try {
+            userService.register(
+                    new UserName(user1.getFirstName()),
+                    new UserEmail(user1.getEmail()),
+                    new UserPassword(user1.getPassword()));
 
-        userService.register(
-                new UserName(user1.getFirstName()),
-                new UserEmail(user1.getEmail()),
-                new UserPassword(user1.getPassword()));
-
-        int result = userRepository.userCount();
-        assertEquals("User must be exist.", 1, result);
+            int result = userRepository.userCount();
+            assertEquals("User must be exist.", 1, result);
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        } catch (RegistrationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testRegistrationUserWithExistingEmail() {
-
         userRepository.update(user1);
 
         try {
-
             userService.register(
                     new UserName(user1.getFirstName()),
                     new UserEmail(user1.getEmail()),
@@ -72,9 +74,7 @@ public class UserServiceTest {
 
     @Test
     public void testRegistrationUserWithIncorrectEmail() {
-
         try {
-
             userService.register(
                     new UserName(user1.getFirstName()),
                     new UserEmail("bla-bla-bla-po4ta.com"),
@@ -90,8 +90,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testFindUserById() throws Exception {
-
+    public void testFindUserById() {
         userRepository.update(user1);
 
         UserDTO userDTO = userService.findById(new UserId(user1.getId()));

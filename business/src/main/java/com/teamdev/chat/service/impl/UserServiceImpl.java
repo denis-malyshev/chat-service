@@ -2,11 +2,11 @@ package com.teamdev.chat.service.impl;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
 import com.teamdev.chat.service.impl.dto.UserDTO;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.dto.UserName;
 import com.teamdev.chat.service.impl.dto.UserPassword;
@@ -58,8 +58,9 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId.id);
 
-        if (user == null)
+        if (user == null) {
             return null;
+        }
 
         return new UserDTO(userId.id, user.getFirstName(), user.getEmail());
     }

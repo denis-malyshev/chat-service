@@ -1,22 +1,15 @@
 package com.teamdev.chat.persistence.dom;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
 public class Message {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private LocalDateTime time;
     private String text;
-    @OneToOne
     private User sender;
-    @OneToOne
     private User receiver;
-    @OneToOne
     private ChatRoom chat;
 
     public Message() {

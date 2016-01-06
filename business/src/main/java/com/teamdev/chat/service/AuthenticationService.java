@@ -1,10 +1,10 @@
 package com.teamdev.chat.service;
 
-import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserEmail;
-import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserId;
 
 public interface AuthenticationService {
 
@@ -12,5 +12,5 @@ public interface AuthenticationService {
 
     void logout(Token token);
 
-    void validation(Token token, UserId userId) throws AuthenticationException;
+    void validate(Token token, UserId userId) throws AuthenticationException;
 }

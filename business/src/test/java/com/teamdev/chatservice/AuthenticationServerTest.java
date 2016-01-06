@@ -2,14 +2,14 @@ package com.teamdev.chatservice;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import com.teamdev.chat.persistence.UserRepository;
+import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.impl.application.ApplicationConfig;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserPassword;
-import com.teamdev.chat.persistence.UserRepository;
-import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -17,9 +17,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.nio.charset.Charset;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class AuthenticationServerTest {
 
@@ -30,7 +28,7 @@ public class AuthenticationServerTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
         tokenService = context.getBean(AuthenticationService.class);
@@ -38,14 +36,18 @@ public class AuthenticationServerTest {
     }
 
     @Test
-    public void testLoginUser() throws Exception {
+    public void testLoginUser() {
 
         String passwordHash = hashFunction.newHasher().putString("pwd", Charset.defaultCharset()).hash().toString();
 
         userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash));
 
-        Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
-        assertNotNull("Token must exists.", token);
+        try {
+            Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
+            assertNotNull("Token must exists.", token);
+        } catch (AuthenticationException e) {
+            fail();
+        }
     }
 
     @Test
@@ -60,7 +62,7 @@ public class AuthenticationServerTest {
     }
 
     @Test
-    public void testLogout() throws Exception {
+    public void testLogout() {
 
         String passwordHash = hashFunction.newHasher().putString("pwd", Charset.defaultCharset()).hash().toString();
 

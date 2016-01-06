@@ -46,16 +46,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                                ChatRoomId chatRoomId)
             throws AuthenticationException, UserNotFoundException, ChatRoomNotFoundException {
 
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId.id);
-        User user = userRepository.findById(userId.id);
-
-        if (user == null) {
-            throw new UserNotFoundException(String.format("User with this id [%d] not exists.", userId.id));
-        }
-
-        if (chatRoom == null) {
-            throw new ChatRoomNotFoundException(String.format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
-        }
+        ChatRoom chatRoom = getChatRoom(chatRoomId);
+        User user = getUser(userId);
 
         user.getChatRooms().add(chatRoom);
         chatRoom.getUsers().add(user);
@@ -64,19 +56,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void leaveChatRoom(Token token,
                               UserId userId,
                               ChatRoomId chatRoomId)
-            throws AuthenticationException, ChatRoomNotFoundException {
+            throws AuthenticationException, ChatRoomNotFoundException, UserNotFoundException {
 
-        User user = userRepository.findById(userId.id);
-
-        if (user == null) {
-            return;
-        }
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId.id);
-
-        if (chatRoom == null) {
-            throw new ChatRoomNotFoundException(String.format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
-        }
+        User user = getUser(userId);
+        ChatRoom chatRoom = getChatRoom(chatRoomId);
 
         user.getChatRooms().remove(chatRoom);
         chatRoom.getUsers().remove(user);
@@ -90,5 +73,23 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             chatRoomDTOs.add(new ChatRoomDTO(chat.getId(), chat.getName(), chat.getUsers().size(), chat.getMessages().size()));
         }
         return chatRoomDTOs;
+    }
+
+    private ChatRoom getChatRoom(ChatRoomId chatRoomId) throws ChatRoomNotFoundException {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId.id);
+
+        if (chatRoom == null) {
+            throw new ChatRoomNotFoundException(String.format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
+        }
+        return chatRoom;
+    }
+
+    private User getUser(UserId userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId.id);
+
+        if (user == null) {
+            throw new UserNotFoundException(String.format("User with this id [%d] not exists.", userId.id));
+        }
+        return user;
     }
 }

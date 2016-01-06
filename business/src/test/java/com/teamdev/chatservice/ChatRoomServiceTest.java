@@ -33,7 +33,7 @@ public class ChatRoomServiceTest {
     private ChatRoomId chatRoomId;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
 
@@ -56,15 +56,17 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testCreateChat() throws Exception {
-
-        ChatRoomDTO chatRoomDTO = chatRoomService.create("chat");
-        assertNotNull("ChatRoomDTO must exists.", chatRoomDTO);
+    public void testCreateChat() {
+        try {
+            ChatRoomDTO chatRoomDTO = chatRoomService.create("chat");
+            assertNotNull("ChatRoomDTO must exists.", chatRoomDTO);
+        } catch (ChatRoomAlreadyExistsException e) {
+            fail();
+        }
     }
 
     @Test
     public void testCreateChatWithExistingName() {
-
         try {
             chatRoomService.create("chat-1");
             fail();
@@ -75,16 +77,18 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testJoinUserToEmptyChat() throws Exception {
-
-        chatRoomService.joinToChatRoom(token, userId, chatRoomId);
-        int result = chatRoomRepository.findById(chatRoomId.id).getUsers().size();
-        assertEquals("The count of users must be 1", 1, result);
+    public void testJoinUserToEmptyChat() {
+        try {
+            chatRoomService.joinToChatRoom(token, userId, chatRoomId);
+            int result = chatRoomRepository.findById(chatRoomId.id).getUsers().size();
+            assertEquals("The count of users must be 1", 1, result);
+        } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
+            fail();
+        }
     }
 
     @Test
     public void testJoinUserToNotExistingChat() {
-
         try {
             chatRoomService.joinToChatRoom(token, userId, new ChatRoomId(34876L));
             fail();
@@ -95,12 +99,15 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testDeleteUserFromChat() throws Exception {
-
+    public void testDeleteUserFromChat() {
         chatRoomRepository.findById(chatRoomId.id).getUsers().add(user);
 
-        chatRoomService.leaveChatRoom(token, userId, chatRoomId);
-        boolean result = chatRoomRepository.findById(chatRoomId.id).getUsers().isEmpty();
-        assertTrue("The count of users in chatRoom must be 0", result);
+        try {
+            chatRoomService.leaveChatRoom(token, userId, chatRoomId);
+            boolean result = chatRoomRepository.findById(chatRoomId.id).getUsers().isEmpty();
+            assertTrue("The count of users in chatRoom must be 0", result);
+        } catch (AuthenticationException | ChatRoomNotFoundException | UserNotFoundException e) {
+            fail();
+        }
     }
 }

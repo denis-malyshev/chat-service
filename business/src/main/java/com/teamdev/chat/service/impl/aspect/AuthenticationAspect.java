@@ -29,7 +29,7 @@ public class AuthenticationAspect {
         Token token = (Token) joinPoint.getArgs()[0];
         UserId userId = (UserId) joinPoint.getArgs()[1];
 
-        authenticationService.validation(token, userId);
+        authenticationService.validate(token, userId);
 
         joinPoint.proceed();
     }

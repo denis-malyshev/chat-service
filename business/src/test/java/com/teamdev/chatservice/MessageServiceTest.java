@@ -4,7 +4,10 @@ import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.MessageService;
 import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.application.ApplicationConfig;
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.dto.ChatRoomId;
+import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserDTO;
+import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
@@ -33,7 +36,7 @@ public class MessageServiceTest {
     private Token token;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
 
         messageService = context.getBean(MessageService.class);
@@ -48,21 +51,15 @@ public class MessageServiceTest {
         User user1 = new User("Vasya", "vasya@gmail.com", "pwd1");
         User user2 = new User("Masha", "masha@gmail.com", "pwd");
 
-        UserDTO userDTO1 = userService.register(
-                new UserName(user1.getFirstName()),
-                new UserEmail(user1.getEmail()),
-                new UserPassword(user1.getPassword()));
+        UserDTO userDTO1 = TestUtils.registerUser(userService,user1);
 
-        UserDTO userDTO2 = userService.register(
-                new UserName(user2.getFirstName()),
-                new UserEmail(user2.getEmail()),
-                new UserPassword(user2.getPassword()));
+        UserDTO userDTO2 = TestUtils.registerUser(userService, user2);
 
         senderId = new UserId(userDTO1.id);
         recipientId = new UserId(userDTO2.id);
 
         AuthenticationService tokenService = context.getBean(AuthenticationService.class);
-        token = tokenService.login(new UserEmail(userDTO1.email), new UserPassword("pwd1"));
+        token = TestUtils.loginUser(userDTO1, tokenService);
     }
 
     @Test

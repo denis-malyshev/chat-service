@@ -1,13 +1,9 @@
 package com.teamdev.chat.persistence.dom;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
 public class AuthenticationToken {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private LocalDateTime expirationTime;

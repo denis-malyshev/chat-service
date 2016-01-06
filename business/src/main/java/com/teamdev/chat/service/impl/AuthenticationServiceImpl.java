@@ -2,13 +2,13 @@ package com.teamdev.chat.service.impl;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.persistence.AuthenticationTokenRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
@@ -55,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void validation(Token token, UserId userId) throws AuthenticationException {
+    public void validate(Token token, UserId userId) throws AuthenticationException {
 
         AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
 

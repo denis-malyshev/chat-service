@@ -51,7 +51,7 @@ public class RequestFilter implements Filter {
         AuthenticationService tokenService = beanProvider.getBean(AuthenticationService.class);
 
         try {
-            tokenService.validation(token, userId);
+            tokenService.validate(token, userId);
         } catch (AuthenticationException e) {
 
             if (e.getMessage().equals("Invalid token.")) {

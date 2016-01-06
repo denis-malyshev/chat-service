@@ -1,7 +1,7 @@
 package com.teamdev.chat.persistence.repository;
 
-import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.AuthenticationTokenRepository;
+import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;

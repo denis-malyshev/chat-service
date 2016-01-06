@@ -19,6 +19,7 @@
         <module>persistence</module>
         <module>webapp</module>
         <module>integration-tests</module>
+        <module>utils</module>
     </modules>
 
 </project>

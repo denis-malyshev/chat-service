@@ -1,20 +1,14 @@
 package com.teamdev.chat.persistence.dom;
 
-import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
 public class ChatRoom {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;
-    @OneToMany
     private Set<Message> messages = new HashSet<>();
-    @OneToMany
     private Set<User> users = new HashSet<>();
 
     public ChatRoom() {

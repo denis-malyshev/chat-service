@@ -1,5 +1,11 @@
 package com.teamdev.chat.service.impl;
 
+import com.teamdev.chat.persistence.ChatRoomRepository;
+import com.teamdev.chat.persistence.MessageRepository;
+import com.teamdev.chat.persistence.UserRepository;
+import com.teamdev.chat.persistence.dom.ChatRoom;
+import com.teamdev.chat.persistence.dom.Message;
+import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.MessageService;
 import com.teamdev.chat.service.impl.dto.ChatRoomId;
 import com.teamdev.chat.service.impl.dto.MessageDTO;
@@ -8,12 +14,6 @@ import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
-import com.teamdev.chat.persistence.ChatRoomRepository;
-import com.teamdev.chat.persistence.MessageRepository;
-import com.teamdev.chat.persistence.UserRepository;
-import com.teamdev.chat.persistence.dom.ChatRoom;
-import com.teamdev.chat.persistence.dom.Message;
-import com.teamdev.chat.persistence.dom.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,19 +34,10 @@ public class MessageServiceImpl implements MessageService {
     public MessageDTO sendMessage(Token token, UserId userId, ChatRoomId chatRoomId, String text)
             throws AuthenticationException, UserNotFoundException, ChatRoomNotFoundException {
 
-        User user = userRepository.findById(userId.id);
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId.id);
-
-        if (user == null) {
-            throw new UserNotFoundException(String.format("User with this id [%d] not exists.", userId.id));
-        }
-
-        if (chatRoom == null) {
-            throw new ChatRoomNotFoundException(String.format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
-        }
+        User user = getUser(userId);
+        ChatRoom chatRoom = getChatRoom(chatRoomId);
 
         Message message = new Message(text, user, chatRoom);
-
         messageRepository.update(message);
 
         user.getMessages().add(message);
@@ -59,16 +50,8 @@ public class MessageServiceImpl implements MessageService {
     public MessageDTO sendPrivateMessage(Token token, UserId senderId, UserId receiverId, String text)
             throws AuthenticationException, UserNotFoundException {
 
-        User sender = userRepository.findById(senderId.id);
-        User receiver = userRepository.findById(receiverId.id);
-
-        if (sender == null) {
-            throw new UserNotFoundException(String.format("User with this id [%d] not exists.", senderId.id));
-        }
-
-        if (receiver == null) {
-            throw new UserNotFoundException(String.format("User with this id [%d] not exists.", receiverId.id));
-        }
+        User sender = getUser(senderId);
+        User receiver = getUser(receiverId);
 
         Message message = new Message(text, sender, receiver);
         messageRepository.update(message);
@@ -77,5 +60,23 @@ public class MessageServiceImpl implements MessageService {
         receiver.getMessages().add(message);
 
         return new MessageDTO(message.getId(), message.getText(), message.getTime());
+    }
+
+    private ChatRoom getChatRoom(ChatRoomId chatRoomId) throws ChatRoomNotFoundException {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId.id);
+
+        if (chatRoom == null) {
+            throw new ChatRoomNotFoundException(String.format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
+        }
+        return chatRoom;
+    }
+
+    private User getUser(UserId userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId.id);
+
+        if (user == null) {
+            throw new UserNotFoundException(String.format("User with this id [%d] not exists.", userId.id));
+        }
+        return user;
     }
 }
