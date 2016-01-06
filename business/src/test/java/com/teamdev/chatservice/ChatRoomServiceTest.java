@@ -1,21 +1,21 @@
 package com.teamdev.chatservice;
 
-import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chat.service.impl.application.ApplicationConfig;
-import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
-import com.teamdev.chat.service.impl.dto.ChatRoomId;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.persistence.AuthenticationTokenRepository;
 import com.teamdev.chat.persistence.ChatRoomRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.ChatRoomService;
+import com.teamdev.chat.service.impl.application.ApplicationConfig;
+import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
+import com.teamdev.chat.service.impl.dto.ChatRoomId;
+import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserId;
+import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
+import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
+import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -61,7 +61,7 @@ public class ChatRoomServiceTest {
             ChatRoomDTO chatRoomDTO = chatRoomService.create("chat");
             assertNotNull("ChatRoomDTO must exists.", chatRoomDTO);
         } catch (ChatRoomAlreadyExistsException e) {
-            fail();
+            fail("Unexpected exception.");
         }
     }
 
@@ -83,7 +83,7 @@ public class ChatRoomServiceTest {
             int result = chatRoomRepository.findById(chatRoomId.id).getUsers().size();
             assertEquals("The count of users must be 1", 1, result);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
-            fail();
+            fail("Unexpected exception.");
         }
     }
 
@@ -107,7 +107,7 @@ public class ChatRoomServiceTest {
             boolean result = chatRoomRepository.findById(chatRoomId.id).getUsers().isEmpty();
             assertTrue("The count of users in chatRoom must be 0", result);
         } catch (AuthenticationException | ChatRoomNotFoundException | UserNotFoundException e) {
-            fail();
+            fail("Unexpected exception.");
         }
     }
 }

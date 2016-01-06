@@ -1,23 +1,24 @@
 package com.teamdev.chat.service.impl;
 
-import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
-import com.teamdev.chat.service.impl.dto.ChatRoomId;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.persistence.ChatRoomRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.ChatRoomService;
+import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
+import com.teamdev.chat.service.impl.dto.ChatRoomId;
+import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserId;
+import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
+import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
+import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatRoomServiceImpl implements ChatRoomService {
@@ -66,13 +67,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public Collection<ChatRoomDTO> findAll() {
+    public ArrayList<ChatRoomDTO> findAll() {
         Collection<ChatRoom> chatRooms = chatRoomRepository.findAll();
-        Collection<ChatRoomDTO> chatRoomDTOs = new ArrayList<>();
-        for (ChatRoom chat : chatRooms) {
-            chatRoomDTOs.add(new ChatRoomDTO(chat.getId(), chat.getName(), chat.getUsers().size(), chat.getMessages().size()));
-        }
-        return chatRoomDTOs;
+        return chatRooms.stream().
+                map(chat -> new ChatRoomDTO(
+                        chat.getId(),
+                        chat.getName(),
+                        chat.getUsers().size(),
+                        chat.getMessages().size())).
+                collect(Collectors.toCollection(ArrayList<ChatRoomDTO>::new));
     }
 
     private ChatRoom getChatRoom(ChatRoomId chatRoomId) throws ChatRoomNotFoundException {

@@ -1,7 +1,6 @@
 package com.teamdev.web;
 
 import com.teamdev.chat.service.AuthenticationService;
-import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
@@ -41,25 +40,18 @@ public class RequestFilter implements Filter {
         Token token = new Token(parameterMap.get("token")[0]);
         UserId userId = new UserId(Long.parseLong(parameterMap.get("userId")[0]));
 
-        UserService userService = beanProvider.getBean(UserService.class);
-
-        if (userService.findById(userId) == null) {
-            response.sendError(403, "User with this id not existing.");
-            return;
-        }
-
         AuthenticationService tokenService = beanProvider.getBean(AuthenticationService.class);
 
         try {
             tokenService.validate(token, userId);
         } catch (AuthenticationException e) {
 
-            if (e.getMessage().equals("Invalid token.")) {
+            if ("Invalid token.".equals(e.getMessage())) {
                 response.sendError(403, "Access denied.");
                 return;
             }
 
-            if (e.getMessage().equals("Token has been expired.")) {
+            if ("Token has been expired.".equals(e.getMessage())) {
                 response.sendError(403, "Token has been expired.");
                 return;
             }

@@ -1,15 +1,10 @@
 package com.teamdev.chat.service;
 
-import com.teamdev.chat.service.impl.dto.UserDTO;
-import com.teamdev.chat.service.impl.dto.UserEmail;
-import com.teamdev.chat.service.impl.dto.UserName;
-import com.teamdev.chat.service.impl.dto.UserPassword;
+import com.teamdev.chat.service.impl.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
-import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.dto.UserId;
 
-import java.util.Set;
+import java.util.ArrayList;
 
 public interface UserService {
 
@@ -18,5 +13,5 @@ public interface UserService {
 
     UserDTO findById(UserId userId);
 
-    Set<ChatRoomDTO> findAvailableChats(UserId userId);
+    ArrayList<ChatRoomDTO> findAvailableChats(UserId userId);
 }

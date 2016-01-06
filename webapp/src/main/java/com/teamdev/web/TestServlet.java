@@ -1,12 +1,14 @@
 package com.teamdev.web;
 
-import com.teamdev.chat.service.impl.dto.*;
-import com.teamdev.chat.service.impl.exception.*;
-import com.teamdev.utils.ChatUtils;
-import com.teamdev.chat.service.AuthenticationService;
-import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chat.service.MessageService;
+import com.teamdev.chat.persistence.AuthenticationTokenRepository;
+import com.teamdev.chat.persistence.ChatRoomRepository;
+import com.teamdev.chat.persistence.UserRepository;
+import com.teamdev.chat.persistence.dom.AuthenticationToken;
+import com.teamdev.chat.persistence.dom.ChatRoom;
+import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.UserService;
+import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
+import com.teamdev.chat.service.impl.dto.UserId;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,8 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
+
+import static com.teamdev.utils.ToolsProvider.passwordHash;
+import static com.teamdev.utils.ToolsProvider.toJson;
 
 public class TestServlet extends HttpServlet {
 
@@ -26,20 +31,7 @@ public class TestServlet extends HttpServlet {
 
         beanProvider = BeanProvider.getInstance();
 
-        try {
-            generateSampleData();
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        } catch (ChatRoomAlreadyExistsException e) {
-            e.printStackTrace();
-        } catch (UserNotFoundException e) {
-            e.printStackTrace();
-        } catch (ChatRoomNotFoundException e) {
-            e.printStackTrace();
-        } catch (RegistrationException e) {
-            e.printStackTrace();
-        }
-
+        generateSampleData();
     }
 
     @Override
@@ -55,33 +47,31 @@ public class TestServlet extends HttpServlet {
         UserId userId = new UserId(Long.parseLong(parameterMap.get("userId")[0]));
 
         UserService userService = beanProvider.getBean(UserService.class);
-        Set<ChatRoomDTO> availableChats = userService.findAvailableChats(userId);
+        ArrayList<ChatRoomDTO> availableChats = userService.findAvailableChats(userId);
 
-        printWriter.write(ChatUtils.toJson(availableChats));
+        printWriter.write(toJson(availableChats));
     }
 
-    private void generateSampleData() throws AuthenticationException, ChatRoomAlreadyExistsException, UserNotFoundException, ChatRoomNotFoundException, RegistrationException {
+    private void generateSampleData() {
 
-        ChatRoomService chatRoomService = beanProvider.getBean(ChatRoomService.class);
+        ChatRoomRepository chatRoomRepository = beanProvider.getBean(ChatRoomRepository.class);
+        ChatRoom chatRoom = new ChatRoom("test-room");
+        chatRoomRepository.update(chatRoom);
 
-        ChatRoomDTO chatRoomDTO = chatRoomService.create("TestRoom");
+        UserRepository userRepository = beanProvider.getBean(UserRepository.class);
 
-        UserService userService = beanProvider.getBean(UserService.class);
+        User user1 = new User("Vasya", "vasya@gmail.com", passwordHash("pwd"));
+        User user2 = new User("Masha", "masha@gmail.com", passwordHash("pwd"));
 
-        UserDTO userDTO1 = userService.register(new UserName("Vasya"), new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
-        UserDTO userDTO2 = userService.register(new UserName("Masha"), new UserEmail("masha@gmail.com"), new UserPassword("pwd1"));
+        userRepository.update(user1);
+        userRepository.update(user2);
 
-        AuthenticationService tokenService = beanProvider.getBean(AuthenticationService.class);
+        AuthenticationTokenRepository tokenRepository = beanProvider.getBean(AuthenticationTokenRepository.class);
+        AuthenticationToken token = new AuthenticationToken(user1.getId());
+        tokenRepository.update(token);
+        user1.setToken(token.getKey());
 
-        Token token1 = tokenService.login(new UserEmail(userDTO1.email), new UserPassword("pwd"));
-
-        UserId id1 = new UserId(userDTO1.id);
-        UserId id2 = new UserId(userDTO2.id);
-
-        chatRoomService.joinToChatRoom(token1, new UserId(userDTO1.id), new ChatRoomId(chatRoomDTO.id));
-
-        MessageService messageService = beanProvider.getBean(MessageService.class);
-
-        messageService.sendPrivateMessage(token1, id1, id2, "Hello, Masha!");
+        chatRoom.getUsers().add(user1);
+        user1.getChatRooms().add(chatRoom);
     }
 }

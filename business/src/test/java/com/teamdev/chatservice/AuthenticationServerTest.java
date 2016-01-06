@@ -1,7 +1,5 @@
 package com.teamdev.chatservice;
 
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
@@ -15,17 +13,13 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.nio.charset.Charset;
-
+import static com.teamdev.utils.ToolsProvider.passwordHash;
 import static org.junit.Assert.*;
 
 public class AuthenticationServerTest {
 
     private AuthenticationService tokenService;
     private UserRepository userRepository;
-
-    private HashFunction hashFunction = Hashing.md5();
-
 
     @Before
     public void setUp() {
@@ -37,16 +31,13 @@ public class AuthenticationServerTest {
 
     @Test
     public void testLoginUser() {
-
-        String passwordHash = hashFunction.newHasher().putString("pwd", Charset.defaultCharset()).hash().toString();
-
-        userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash));
+        userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash("pwd")));
 
         try {
             Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
             assertNotNull("Token must exists.", token);
         } catch (AuthenticationException e) {
-            fail();
+            fail("Unexpected exception.");
         }
     }
 
@@ -63,10 +54,7 @@ public class AuthenticationServerTest {
 
     @Test
     public void testLogout() {
-
-        String passwordHash = hashFunction.newHasher().putString("pwd", Charset.defaultCharset()).hash().toString();
-
-        userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash));
+        userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash("pwd")));
 
         try {
             Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));

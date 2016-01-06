@@ -1,24 +1,18 @@
 package com.teamdev.chatservice;
 
-import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.application.ApplicationConfig;
-import com.teamdev.chat.service.impl.dto.UserDTO;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.dto.UserEmail;
-import com.teamdev.chat.service.impl.dto.UserId;
-import com.teamdev.chat.service.impl.dto.UserName;
-import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.UserService;
+import com.teamdev.chat.service.impl.application.ApplicationConfig;
+import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class UserServiceTest {
 
@@ -46,10 +40,8 @@ public class UserServiceTest {
 
             int result = userRepository.userCount();
             assertEquals("User must be exist.", 1, result);
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        } catch (RegistrationException e) {
-            e.printStackTrace();
+        } catch (AuthenticationException | RegistrationException e) {
+            fail("Unexpected exception.");
         }
     }
 

@@ -2,21 +2,22 @@ package com.teamdev.chat.service.impl;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
-import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.persistence.AuthenticationTokenRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.Charset;
 import java.time.LocalDateTime;
+
+import static com.teamdev.utils.ToolsProvider.passwordHash;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -35,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         User user = userRepository.findByMail(userEmail.email);
 
-        String passwordHash = hashFunction.newHasher().putString(password.password, Charset.defaultCharset()).hash().toString();
+        String passwordHash = passwordHash(password.password);
 
         if (user == null || !user.getPassword().equals(passwordHash)) {
             throw new AuthenticationException("Invalid login or password.");
