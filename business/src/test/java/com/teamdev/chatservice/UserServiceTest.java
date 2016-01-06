@@ -73,13 +73,11 @@ public class UserServiceTest {
     @Test
     public void testRegistrationUserWithIncorrectEmail() {
 
-        userRepository.update(user1);
-
         try {
 
             userService.register(
                     new UserName(user1.getFirstName()),
-                    new UserEmail(user1.getEmail()),
+                    new UserEmail("bla-bla-bla-po4ta.com"),
                     new UserPassword(user1.getPassword()));
 
             fail();
