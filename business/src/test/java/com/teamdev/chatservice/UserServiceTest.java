@@ -10,6 +10,7 @@ import com.teamdev.chat.service.impl.dto.UserName;
 import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.impl.exception.RegistrationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -64,6 +65,29 @@ public class UserServiceTest {
         } catch (AuthenticationException e) {
             String result = e.getMessage();
             assertEquals("Exception message must be correct.", "User with the same mail already exists.", result);
+        } catch (RegistrationException e) {
+            fail("Unexpected exception.");
+        }
+    }
+
+    @Test
+    public void testRegistrationUserWithIncorrectEmail() {
+
+        userRepository.update(user1);
+
+        try {
+
+            userService.register(
+                    new UserName(user1.getFirstName()),
+                    new UserEmail(user1.getEmail()),
+                    new UserPassword(user1.getPassword()));
+
+            fail();
+        } catch (AuthenticationException e) {
+            fail("Unexpected exception.");
+        } catch (RegistrationException e) {
+            String result = e.getMessage();
+            assertEquals("Exception message must be correct.", "Enter a correct email.", result);
         }
     }
 

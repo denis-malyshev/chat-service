@@ -13,15 +13,21 @@ import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.impl.exception.RegistrationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+            + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     @Autowired
     private UserRepository userRepository;
@@ -31,7 +37,10 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl() {
     }
 
-    public UserDTO register(UserName name, UserEmail email, UserPassword password) throws AuthenticationException {
+    public UserDTO register(UserName name, UserEmail email, UserPassword password)
+            throws AuthenticationException, RegistrationException {
+
+        emailValidation(email);
 
         if (userRepository.userCount() > 0 && userRepository.findByMail(email.email) != null) {
             throw new AuthenticationException("User with the same mail already exists.");
@@ -60,8 +69,18 @@ public class UserServiceImpl implements UserService {
         Set<ChatRoom> chatRooms = userRepository.findById(userId.id).getChatRooms();
         Set<ChatRoomDTO> chatRoomDTOs = new HashSet<>();
         for (ChatRoom chatRoom : chatRooms) {
-            chatRoomDTOs.add(new ChatRoomDTO(chatRoom.getId(),chatRoom.getName(),chatRoom.getUsers().size(),chatRoom.getMessages().size()));
+            chatRoomDTOs.add(new ChatRoomDTO(chatRoom.getId(), chatRoom.getName(), chatRoom.getUsers().size(), chatRoom.getMessages().size()));
         }
         return chatRoomDTOs;
+    }
+
+    private void emailValidation(UserEmail email) throws RegistrationException {
+
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(email.email);
+
+        if (!matcher.matches()) {
+            throw new RegistrationException("Enter a correct email.");
+        }
     }
 }
