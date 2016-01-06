@@ -10,5 +10,7 @@ public interface AuthenticationService {
 
     Token login(UserEmail email, UserPassword password) throws AuthenticationException;
 
+    void logout(Token token);
+
     void validation(Token token, UserId userId) throws AuthenticationException;
 }

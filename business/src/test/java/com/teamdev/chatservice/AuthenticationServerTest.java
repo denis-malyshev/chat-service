@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class AuthenticationServerTest {
 
@@ -55,6 +56,21 @@ public class AuthenticationServerTest {
         } catch (AuthenticationException e) {
             String result = e.getMessage();
             assertEquals("Exception message must be correct.", "Invalid login or password.", result);
+        }
+    }
+
+    @Test
+    public void testLogout() throws Exception {
+
+        String passwordHash = hashFunction.newHasher().putString("pwd", Charset.defaultCharset()).hash().toString();
+
+        userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash));
+
+        try {
+            Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
+            tokenService.logout(token);
+        } catch (AuthenticationException e) {
+            fail("Unexpected exception.");
         }
     }
 }

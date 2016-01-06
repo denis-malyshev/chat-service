@@ -2,16 +2,16 @@ package com.teamdev.chat.service.impl;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import com.teamdev.chat.persistence.AuthenticationTokenRepository;
+import com.teamdev.chat.persistence.UserRepository;
+import com.teamdev.chat.persistence.dom.AuthenticationToken;
+import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.persistence.AuthenticationTokenRepository;
-import com.teamdev.chat.persistence.UserRepository;
-import com.teamdev.chat.persistence.dom.AuthenticationToken;
-import com.teamdev.chat.persistence.dom.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +44,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         AuthenticationToken token = generateToken(user.getId());
         user.setToken(token.getKey());
         return new Token(token.getKey());
+    }
+
+    @Override
+    public void logout(Token token) {
+        AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
+        if (innerToken != null) {
+            tokenRepository.delete(innerToken.getId());
+        }
     }
 
     @Override
