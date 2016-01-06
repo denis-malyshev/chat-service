@@ -1,5 +1,8 @@
 package com.teamdev.integration.tests;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -10,6 +13,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import static com.google.common.io.ByteStreams.toByteArray;
 import static org.junit.Assert.assertEquals;
@@ -31,12 +35,16 @@ public class IntegrationTest {
     @Test
     public void testPositiveGetToURL_shouldReturnProperJSON() throws Exception {
 
-        request = new HttpGet("http://localhost:8080/chats?token=" + validTokenKey + "&userId=" + validUserId);
+        request = new HttpGet(String.format("http://localhost:8080/chats?token=%s&userId=%d", validTokenKey, validUserId));
         HttpResponse response = httpClient.execute(request);
 
-        String result = contentToString(response);
+        String json = contentToString(response);
 
-        assertEquals("[{\"id\":1,\"name\":\"TestRoom\",\"userCount\":1,\"messageCount\":0}]", result);
+        Set<ChatRoomDTO> chatRoomDTOs = fromJson(json);
+
+        int result = chatRoomDTOs.size();
+
+        assertEquals("The count of chat-rooms must be 1.", 1, result);
     }
 
     @Test
@@ -58,5 +66,11 @@ public class IntegrationTest {
             e.printStackTrace();
         }
         return new String(bytes);
+    }
+
+    private Set<ChatRoomDTO> fromJson(String json) {
+        Gson gson = new Gson();
+        return gson.fromJson(json, new TypeToken<Set<ChatRoomDTO>>() {
+        }.getType());
     }
 }
