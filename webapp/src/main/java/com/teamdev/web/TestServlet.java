@@ -6,10 +6,7 @@ import com.teamdev.chat.service.ChatRoomService;
 import com.teamdev.chat.service.MessageService;
 import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.dto.*;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import com.teamdev.chat.service.impl.exception.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,6 +37,8 @@ public class TestServlet extends HttpServlet {
             e.printStackTrace();
         } catch (ChatRoomNotFoundException e) {
             e.printStackTrace();
+        } catch (RegistrationException e) {
+            e.printStackTrace();
         }
 
     }
@@ -65,7 +64,7 @@ public class TestServlet extends HttpServlet {
         printWriter.write(json);
     }
 
-    private void generateSampleData() throws AuthenticationException, ChatRoomAlreadyExistsException, UserNotFoundException, ChatRoomNotFoundException {
+    private void generateSampleData() throws AuthenticationException, ChatRoomAlreadyExistsException, UserNotFoundException, ChatRoomNotFoundException, RegistrationException {
 
         ChatRoomService chatRoomService = beanProvider.getBean(ChatRoomService.class);
 
