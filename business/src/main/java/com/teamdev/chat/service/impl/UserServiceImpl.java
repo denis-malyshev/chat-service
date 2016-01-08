@@ -7,6 +7,7 @@ import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
+import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.teamdev.utils.ToolsProvider.passwordHash;
+import static com.teamdev.utils.JsonHelper.passwordHash;
+import static java.lang.String.format;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -35,7 +37,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO register(UserName name, UserEmail email, UserPassword password)
             throws AuthenticationException, RegistrationException {
 
-        LOG.info(String.format("User registration %s.", name.name));
+        LOG.info(format("Registration user %s.", email.email));
 
         emailValidation(email);
 
@@ -47,20 +49,20 @@ public class UserServiceImpl implements UserService {
 
         User user = new User(name.name, email.email, passwordHash);
         userRepository.update(user);
-        LOG.info(String.format("User %s successfully registered", user.getFirstName()));
+        LOG.info(format("User %s successfully registered.", user.getFirstName()));
         return new UserDTO(user.getId(), user.getFirstName(), user.getEmail());
     }
 
     @Override
-    public UserDTO findById(UserId userId) {
-
+    public UserDTO findById(UserId userId) throws UserNotFoundException {
+        LOG.info(format("Trying to find user with id[%d].", userId.id));
         User user = userRepository.findById(userId.id);
 
         if (user == null) {
-            LOG.error(String.format("User with id[%d] not exists.", userId.id));
-            return null;
+            throw new UserNotFoundException(format("User with id[%d] not exists.", userId.id));
         }
 
+        LOG.info(format("User %s was successfully found.", user.getEmail()));
         return new UserDTO(userId.id, user.getFirstName(), user.getEmail());
     }
 
@@ -77,7 +79,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void emailValidation(UserEmail email) throws RegistrationException {
-        LOG.info("Checking an email address is valid or not.");
+        LOG.info("Checking an email address is correct or not.");
 
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
         Matcher matcher = pattern.matcher(email.email);
@@ -86,6 +88,6 @@ public class UserServiceImpl implements UserService {
             throw new RegistrationException("Enter a correct email.");
         }
 
-        LOG.info("Email address is valid.");
+        LOG.info("Email address is correct.");
     }
 }

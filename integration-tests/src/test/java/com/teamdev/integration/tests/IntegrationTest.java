@@ -2,7 +2,7 @@ package com.teamdev.integration.tests;
 
 import com.google.gson.reflect.TypeToken;
 import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.utils.ToolsProvider;
+import com.teamdev.utils.JsonHelper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static com.teamdev.utils.ToolsProvider.contentToString;
+import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -39,7 +39,7 @@ public class IntegrationTest {
             HttpResponse response = httpClient.execute(request);
             String json = contentToString(response);
 
-            ArrayList<ChatRoomDTO> chatRoomDTOs = ToolsProvider.fromJson(json, new TypeToken<ArrayList<ChatRoomDTO>>() {
+            ArrayList<ChatRoomDTO> chatRoomDTOs = JsonHelper.fromJson(json, new TypeToken<ArrayList<ChatRoomDTO>>() {
             }.getType());
 
             int result = chatRoomDTOs.size();

@@ -1,7 +1,5 @@
 package com.teamdev.chat.service.impl;
 
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import com.teamdev.chat.persistence.AuthenticationTokenRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.AuthenticationToken;
@@ -18,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static com.teamdev.utils.ToolsProvider.passwordHash;
+import static com.teamdev.utils.JsonHelper.passwordHash;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -29,13 +27,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private UserRepository userRepository;
 
-    private HashFunction hashFunction = Hashing.md5();
-
     public AuthenticationServiceImpl() {
     }
 
     public Token login(UserEmail userEmail, UserPassword password) throws AuthenticationException {
-
+        LOG.info(String.format("User %s trying to login.", userEmail.email));
         User user = userRepository.findByMail(userEmail.email);
 
         String passwordHash = passwordHash(password.password);
@@ -46,6 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         AuthenticationToken token = generateToken(user.getId());
         user.setToken(token.getKey());
+        LOG.info(String.format("User %s logged successfully.", userEmail.email));
         return new Token(token.getKey());
     }
 
@@ -59,7 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void validate(Token token, UserId userId) throws AuthenticationException {
-
+        LOG.info("Checking user token.");
         AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
 
         if (innerToken == null || innerToken.getUserId() != userId.id) {
@@ -68,6 +65,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (innerToken.getExpirationTime().compareTo(LocalDateTime.now()) < 1) {
             throw new AuthenticationException("Token has been expired.");
         }
+
+        LOG.info("User's token is valid.");
     }
 
     private AuthenticationToken generateToken(long userId) {

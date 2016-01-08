@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.teamdev.utils.ToolsProvider.passwordHash;
+import static com.teamdev.utils.JsonHelper.passwordHash;
 import static org.junit.Assert.*;
 
 public class AuthenticationServerTest {

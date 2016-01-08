@@ -39,7 +39,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         LOG.info(format("Creating chat-room \"%s.\"", chatRoomName));
 
         if (chatRoomRepository.chatRoomCount() > 0 && chatRoomRepository.findByName(chatRoomName) != null) {
-            throw new ChatRoomAlreadyExistsException("ChatRoom with the same name already exists.");
+            throw new ChatRoomAlreadyExistsException(format("ChatRoom %s already exists.", chatRoomName));
         }
 
         ChatRoom chatRoom = new ChatRoom(chatRoomName);

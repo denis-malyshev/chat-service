@@ -7,6 +7,7 @@ import com.teamdev.chat.service.impl.application.ApplicationConfig;
 import com.teamdev.chat.service.impl.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
+import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -82,7 +83,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testFindUserById() {
+    public void testFindUserById() throws UserNotFoundException {
         userRepository.update(user1);
 
         UserDTO userDTO = userService.findById(new UserId(user1.getId()));

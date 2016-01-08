@@ -1,6 +1,5 @@
 package com.teamdev.web;
 
-import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.ChatRoomService;
 import com.teamdev.chat.service.UserService;
@@ -17,8 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.teamdev.utils.ToolsProvider.passwordHash;
-import static com.teamdev.utils.ToolsProvider.toJson;
+import static com.teamdev.utils.JsonHelper.toJson;
 
 public class TestServlet extends HttpServlet {
 
@@ -32,7 +30,19 @@ public class TestServlet extends HttpServlet {
         beanProvider = BeanProvider.getInstance();
 
         LOG.info("Generate sample data.");
-        generateSampleData();
+        try {
+            generateSampleData();
+        } catch (ChatRoomAlreadyExistsException e) {
+            LOG.error("ChatRoomAlreadyExistsException: ", e);
+        } catch (AuthenticationException e) {
+            LOG.error("AuthenticationException: ", e);
+        } catch (RegistrationException e) {
+            LOG.error("RegistrationException: ", e);
+        } catch (UserNotFoundException e) {
+            LOG.error("UserNotFoundException: ", e);
+        } catch (ChatRoomNotFoundException e) {
+            LOG.error("ChatRoomNotFoundException: ", e);
+        }
     }
 
     @Override
@@ -53,38 +63,20 @@ public class TestServlet extends HttpServlet {
         printWriter.write(toJson(availableChats));
     }
 
-    private void generateSampleData() {
+    private void generateSampleData() throws ChatRoomAlreadyExistsException, AuthenticationException, RegistrationException, UserNotFoundException, ChatRoomNotFoundException {
 
         ChatRoomService chatRoomService = beanProvider.getBean(ChatRoomService.class);
-        ChatRoomDTO chatRoomDTO = null;
-        try {
-            chatRoomDTO = chatRoomService.create("test-chat");
-        } catch (ChatRoomAlreadyExistsException e) {
-            LOG.error("ChatRoomAlreadyExistsException: ", e);
-        }
+        ChatRoomDTO chatRoomDTO = chatRoomService.create("test-chat");
 
         UserService userService = beanProvider.getBean(UserService.class);
 
-        User user1 = new User("Vasya", "vasya@gmail.com", passwordHash("pwd"));
-        UserDTO userDTO1 = null;
-        try {
-            userDTO1 = userService.register(new UserName(user1.getFirstName()), new UserEmail(user1.getEmail()), new UserPassword("pwd"));
-        } catch (AuthenticationException e) {
-            LOG.error("AuthenticationException: ", e);
-        } catch (RegistrationException e) {
-            LOG.error("RegistrationException: ", e);
-        }
+        UserName userName = new UserName("Vasya");
+        UserEmail userEmail = new UserEmail("vasya@gmail.com");
+        UserPassword userPassword = new UserPassword("pwd");
+        UserDTO userDTO1 = userService.register(userName, userEmail, userPassword);
 
         AuthenticationService tokenService = beanProvider.getBean(AuthenticationService.class);
-        try {
-            Token token = tokenService.login(new UserEmail(user1.getEmail()), new UserPassword("pwd"));
-            chatRoomService.joinToChatRoom(token, new UserId(userDTO1.id), new ChatRoomId(chatRoomDTO.id));
-        } catch (AuthenticationException e) {
-            LOG.error("AuthenticationException: ", e);
-        } catch (UserNotFoundException e) {
-            LOG.error("UserNotFoundException: ", e);
-        } catch (ChatRoomNotFoundException e) {
-            LOG.error("ChatRoomNotFoundException: ", e);
-        }
+        Token token = tokenService.login(userEmail, userPassword);
+        chatRoomService.joinToChatRoom(token, new UserId(userDTO1.id), new ChatRoomId(chatRoomDTO.id));
     }
 }
