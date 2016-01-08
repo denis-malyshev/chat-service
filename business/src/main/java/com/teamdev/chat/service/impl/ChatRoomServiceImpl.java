@@ -13,6 +13,7 @@ import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +21,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Service
 public class ChatRoomServiceImpl implements ChatRoomService {
 
+    private static final Logger LOG = Logger.getLogger(ChatRoomServiceImpl.class);
     @Autowired
     private ChatRoomRepository chatRoomRepository;
     @Autowired
@@ -32,6 +36,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     public ChatRoomDTO create(String chatRoomName) throws ChatRoomAlreadyExistsException {
+        LOG.info(format("Creating chat-room \"%s.\"", chatRoomName));
 
         if (chatRoomRepository.chatRoomCount() > 0 && chatRoomRepository.findByName(chatRoomName) != null) {
             throw new ChatRoomAlreadyExistsException("ChatRoom with the same name already exists.");
@@ -39,6 +44,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         ChatRoom chatRoom = new ChatRoom(chatRoomName);
         chatRoomRepository.update(chatRoom);
+        LOG.info(format("Chat-room \"%s\" created successfully.", chatRoom.getName()));
         return new ChatRoomDTO(chatRoom.getId(), chatRoom.getName(), 0, 0);
     }
 
@@ -47,11 +53,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                                ChatRoomId chatRoomId)
             throws AuthenticationException, UserNotFoundException, ChatRoomNotFoundException {
 
+        LOG.info(format("Join user with id[%d] into chat-room with id[%d].", userId.id, chatRoomId.id));
+
         ChatRoom chatRoom = getChatRoom(chatRoomId);
         User user = getUser(userId);
 
         user.getChatRooms().add(chatRoom);
         chatRoom.getUsers().add(user);
+
+        LOG.info(format("Joined user with id[%d] into chat-room with id[%d] was successfully.", userId.id, chatRoomId.id));
     }
 
     public void leaveChatRoom(Token token,
@@ -59,11 +69,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                               ChatRoomId chatRoomId)
             throws AuthenticationException, ChatRoomNotFoundException, UserNotFoundException {
 
+        LOG.info(format("Deleting user with id[%d] from chat-room with id[%d].", userId.id, chatRoomId.id));
+
         User user = getUser(userId);
         ChatRoom chatRoom = getChatRoom(chatRoomId);
 
         user.getChatRooms().remove(chatRoom);
         chatRoom.getUsers().remove(user);
+
+        LOG.info(String.format("User[%d] was successfully deleted from chat-room[%d].", userId.id, chatRoomId.id));
     }
 
     @Override
@@ -82,7 +96,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId.id);
 
         if (chatRoom == null) {
-            throw new ChatRoomNotFoundException(String.format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
+            throw new ChatRoomNotFoundException(format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
         }
         return chatRoom;
     }
@@ -91,7 +105,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User user = userRepository.findById(userId.id);
 
         if (user == null) {
-            throw new UserNotFoundException(String.format("User with this id [%d] not exists.", userId.id));
+            throw new UserNotFoundException(format("User with this id [%d] not exists.", userId.id));
         }
         return user;
     }

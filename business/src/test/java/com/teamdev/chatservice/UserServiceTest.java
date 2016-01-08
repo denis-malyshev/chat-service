@@ -86,6 +86,6 @@ public class UserServiceTest {
         userRepository.update(user1);
 
         UserDTO userDTO = userService.findById(new UserId(user1.getId()));
-        assertNotNull("UserDTO must be exist.", userDTO);
+        assertNotNull("UserDTO must exist.", userDTO);
     }
 }

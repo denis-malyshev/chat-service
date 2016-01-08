@@ -7,6 +7,7 @@ import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import static com.teamdev.utils.ToolsProvider.passwordHash;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final Logger LOG = Logger.getLogger(UserServiceImpl.class);
     private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
@@ -33,6 +35,8 @@ public class UserServiceImpl implements UserService {
     public UserDTO register(UserName name, UserEmail email, UserPassword password)
             throws AuthenticationException, RegistrationException {
 
+        LOG.info(String.format("User registration %s.", name.name));
+
         emailValidation(email);
 
         if (userRepository.userCount() > 0 && userRepository.findByMail(email.email) != null) {
@@ -43,6 +47,7 @@ public class UserServiceImpl implements UserService {
 
         User user = new User(name.name, email.email, passwordHash);
         userRepository.update(user);
+        LOG.info(String.format("User %s successfully registered", user.getFirstName()));
         return new UserDTO(user.getId(), user.getFirstName(), user.getEmail());
     }
 
@@ -52,6 +57,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId.id);
 
         if (user == null) {
+            LOG.error(String.format("User with id[%d] not exists.", userId.id));
             return null;
         }
 
@@ -71,6 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void emailValidation(UserEmail email) throws RegistrationException {
+        LOG.info("Checking an email address is valid or not.");
 
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
         Matcher matcher = pattern.matcher(email.email);
@@ -78,5 +85,7 @@ public class UserServiceImpl implements UserService {
         if (!matcher.matches()) {
             throw new RegistrationException("Enter a correct email.");
         }
+
+        LOG.info("Email address is valid.");
     }
 }

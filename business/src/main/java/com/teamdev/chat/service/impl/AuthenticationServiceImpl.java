@@ -12,6 +12,7 @@ import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import static com.teamdev.utils.ToolsProvider.passwordHash;
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
+    private static final Logger LOG = Logger.getLogger(AuthenticationServiceImpl.class);
     @Autowired
     private AuthenticationTokenRepository tokenRepository;
     @Autowired

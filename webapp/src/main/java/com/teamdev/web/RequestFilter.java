@@ -4,6 +4,8 @@ import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 public class RequestFilter implements Filter {
 
+    private static final Logger LOG = Logger.getLogger(RequestFilter.class);
     private BeanProvider beanProvider;
 
     @Override
@@ -45,6 +48,8 @@ public class RequestFilter implements Filter {
         try {
             tokenService.validate(token, userId);
         } catch (AuthenticationException e) {
+
+            LOG.log(Level.ERROR, "AuthenticationException:", e);
 
             if ("Invalid token.".equals(e.getMessage())) {
                 response.sendError(403, "Access denied.");

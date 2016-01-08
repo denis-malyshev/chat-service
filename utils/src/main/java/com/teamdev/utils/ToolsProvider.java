@@ -31,12 +31,8 @@ public class ToolsProvider {
                 hash().toString();
     }
 
-    public static String contentToString(HttpResponse response) {
-        try {
-            InputStream inputStream = response.getEntity().getContent();
-            return new String(toByteArray(inputStream));
-        } catch (IOException e) {
-            return "";
-        }
+    public static String contentToString(HttpResponse response) throws IOException {
+        InputStream inputStream = response.getEntity().getContent();
+        return new String(toByteArray(inputStream));
     }
 }

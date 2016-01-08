@@ -1,5 +1,6 @@
 package com.teamdev.chat.service.impl.application;
 
+import org.apache.log4j.Logger;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
@@ -9,8 +10,10 @@ import javax.annotation.PostConstruct;
 @ComponentScan(basePackages = {"com.teamdev.chat.service.impl","com.teamdev.chat.persistence"})
 public class ApplicationConfig {
 
+    private static final Logger LOG = Logger.getLogger(ApplicationConfig.class);
+
     @PostConstruct
     public void doSomething() {
-        System.out.println("Spring initialized");
+        LOG.info("Spring was initialized.");
     }
 }

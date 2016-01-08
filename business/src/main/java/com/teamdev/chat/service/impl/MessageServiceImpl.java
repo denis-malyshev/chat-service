@@ -14,12 +14,14 @@ import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MessageServiceImpl implements MessageService {
 
+    private static final Logger LOG = Logger.getLogger(MessageServiceImpl.class);
     @Autowired
     private MessageRepository messageRepository;
     @Autowired
@@ -34,6 +36,8 @@ public class MessageServiceImpl implements MessageService {
     public MessageDTO sendMessage(Token token, UserId userId, ChatRoomId chatRoomId, String text)
             throws AuthenticationException, UserNotFoundException, ChatRoomNotFoundException {
 
+        LOG.info(String.format("User with id[%d] sending message to chatRoom with id[%d].", userId.id, chatRoomId.id));
+
         User user = getUser(userId);
         ChatRoom chatRoom = getChatRoom(chatRoomId);
 
@@ -43,12 +47,15 @@ public class MessageServiceImpl implements MessageService {
         user.getMessages().add(message);
         chatRoom.getMessages().add(message);
 
+        LOG.info("Message sent successfully.");
         return new MessageDTO(message.getId(), message.getText(), message.getTime());
     }
 
     @Override
     public MessageDTO sendPrivateMessage(Token token, UserId senderId, UserId receiverId, String text)
             throws AuthenticationException, UserNotFoundException {
+
+        LOG.info(String.format("User with id[%d] sending message to user with id[%d].", senderId.id, receiverId.id));
 
         User sender = getUser(senderId);
         User receiver = getUser(receiverId);
@@ -59,6 +66,7 @@ public class MessageServiceImpl implements MessageService {
         sender.getMessages().add(message);
         receiver.getMessages().add(message);
 
+        LOG.info("Message sent successfully.");
         return new MessageDTO(message.getId(), message.getText(), message.getTime());
     }
 
