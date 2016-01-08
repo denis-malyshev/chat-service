@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.teamdev.utils.JsonHelper.passwordHash;
+import static com.teamdev.utils.PasswordHasher.createHash;
 import static org.junit.Assert.*;
 
 public class AuthenticationServerTest {
@@ -31,7 +31,7 @@ public class AuthenticationServerTest {
 
     @Test
     public void testLoginUser() {
-        userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash("pwd")));
+        userRepository.update(new User("Vasya", "vasya@gmail.com", createHash("pwd")));
 
         try {
             Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
@@ -54,7 +54,7 @@ public class AuthenticationServerTest {
 
     @Test
     public void testLogout() {
-        userRepository.update(new User("Vasya", "vasya@gmail.com", passwordHash("pwd")));
+        userRepository.update(new User("Vasya", "vasya@gmail.com", createHash("pwd")));
 
         try {
             Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));

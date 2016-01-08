@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.teamdev.utils.JsonHelper.passwordHash;
+import static com.teamdev.utils.PasswordHasher.createHash;
 import static java.lang.String.format;
 
 @Service
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
             throw new AuthenticationException("User with the same mail already exists.");
         }
 
-        String passwordHash = passwordHash(password.password);
+        String passwordHash = createHash(password.password);
 
         User user = new User(name.name, email.email, passwordHash);
         userRepository.update(user);

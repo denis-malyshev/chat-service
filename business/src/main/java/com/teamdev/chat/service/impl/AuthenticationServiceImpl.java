@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static com.teamdev.utils.JsonHelper.passwordHash;
+import static com.teamdev.utils.PasswordHasher.createHash;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -34,7 +34,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         LOG.info(String.format("User %s trying to login.", userEmail.email));
         User user = userRepository.findByMail(userEmail.email);
 
-        String passwordHash = passwordHash(password.password);
+        String passwordHash = createHash(password.password);
 
         if (user == null || !user.getPassword().equals(passwordHash)) {
             throw new AuthenticationException("Invalid login or password.");
