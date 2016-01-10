@@ -3,7 +3,6 @@ package com.teamdev.chatservice;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.application.ApplicationConfig;
 import com.teamdev.chat.service.impl.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;

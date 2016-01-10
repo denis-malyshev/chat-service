@@ -3,7 +3,6 @@ package com.teamdev.chatservice;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
-import com.teamdev.chat.service.impl.application.ApplicationConfig;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserPassword;

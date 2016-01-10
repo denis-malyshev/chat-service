@@ -7,7 +7,6 @@ import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chat.service.impl.application.ApplicationConfig;
 import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
 import com.teamdev.chat.service.impl.dto.ChatRoomId;
 import com.teamdev.chat.service.impl.dto.Token;
@@ -58,7 +57,7 @@ public class ChatRoomServiceTest {
     @Test
     public void testCreateChat() {
         try {
-            ChatRoomDTO chatRoomDTO = chatRoomService.create("chat");
+            ChatRoomDTO chatRoomDTO = chatRoomService.create(token, userId, "chat");
             assertNotNull("ChatRoomDTO must exists.", chatRoomDTO);
         } catch (ChatRoomAlreadyExistsException e) {
             fail("Unexpected exception.");
@@ -68,11 +67,11 @@ public class ChatRoomServiceTest {
     @Test
     public void testCreateChatWithExistingName() {
         try {
-            chatRoomService.create("chat-1");
+            chatRoomService.create(token, userId, "chat-1");
             fail();
         } catch (ChatRoomAlreadyExistsException e) {
             String result = e.getMessage();
-            assertEquals("Exception message must be correct.", "ChatRoom with the same name already exists.", result);
+            assertEquals("Exception message must be correct.", "ChatRoom chat-1 already exists.", result);
         }
     }
 

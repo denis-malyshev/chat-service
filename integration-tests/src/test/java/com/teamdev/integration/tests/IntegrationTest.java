@@ -5,6 +5,7 @@ import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
 import com.teamdev.utils.JsonHelper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Before;
@@ -34,7 +35,7 @@ public class IntegrationTest {
 
     @Test
     public void testPositiveGetToURL_shouldReturnProperJSON() {
-        request = new HttpGet(String.format("http://localhost:8080/chats?token=%s&userId=%d", validTokenKey, validUserId));
+        request = new HttpGet(String.format("http://localhost:8080/webapp-1.0/chats?token=%s&userId=%d", validTokenKey, validUserId));
         try {
             HttpResponse response = httpClient.execute(request);
             String json = contentToString(response);
@@ -52,7 +53,7 @@ public class IntegrationTest {
 
     @Test
     public void testNegativeGetToURL_shouldReturnErrorCode_403() {
-        request = new HttpGet("http://localhost:8080/chats?token=999&userId=999");
+        request = new HttpGet("http://localhost:8080/webapp-1.0/chats?token=999&userId=999");
         try {
             HttpResponse response = httpClient.execute(request);
             response.getEntity().getContentType().getValue();

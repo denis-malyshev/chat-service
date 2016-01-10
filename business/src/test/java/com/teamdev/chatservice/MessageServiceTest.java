@@ -7,7 +7,6 @@ import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.MessageService;
-import com.teamdev.chat.service.impl.application.ApplicationConfig;
 import com.teamdev.chat.service.impl.dto.ChatRoomId;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserId;

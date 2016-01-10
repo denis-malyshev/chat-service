@@ -1,4 +1,4 @@
-package com.teamdev.chat.service.impl.application;
+package com.teamdev.chatservice;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.ComponentScan;
