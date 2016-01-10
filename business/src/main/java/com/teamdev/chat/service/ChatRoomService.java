@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public interface ChatRoomService {
 
-    ChatRoomDTO create(String chatRoomName) throws ChatRoomAlreadyExistsException;
+    ChatRoomDTO create(Token token, UserId userId, String chatRoomName) throws ChatRoomAlreadyExistsException;
 
     void joinToChatRoom(Token token, UserId userId, ChatRoomId chatRoomId)
             throws AuthenticationException, UserNotFoundException, ChatRoomNotFoundException;
