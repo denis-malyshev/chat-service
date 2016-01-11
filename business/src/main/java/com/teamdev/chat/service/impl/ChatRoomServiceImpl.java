@@ -83,7 +83,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public ArrayList<ChatRoomDTO> findAll() {
+    public ArrayList<ChatRoomDTO> findAll(Token token, UserId userId) {
         Collection<ChatRoom> chatRooms = chatRoomRepository.findAll();
         return chatRooms.stream().
                 map(chat -> new ChatRoomDTO(

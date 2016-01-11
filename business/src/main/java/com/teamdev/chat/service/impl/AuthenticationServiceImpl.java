@@ -5,10 +5,9 @@ import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
+import com.teamdev.chat.service.impl.dto.LoginInfo;
 import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserEmail;
 import com.teamdev.chat.service.impl.dto.UserId;
-import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +29,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthenticationServiceImpl() {
     }
 
-    public Token login(UserEmail userEmail, UserPassword password) throws AuthenticationException {
-        LOG.info(String.format("User %s trying to login.", userEmail.email));
-        User user = userRepository.findByMail(userEmail.email);
+    public Token login(LoginInfo loginInfo) throws AuthenticationException {
+        LOG.info(String.format("User %s trying to login.", loginInfo.email));
+        User user = userRepository.findByMail(loginInfo.email);
 
-        String passwordHash = createHash(password.password);
+        String passwordHash = createHash(loginInfo.password);
 
         if (user == null || !user.getPassword().equals(passwordHash)) {
             throw new AuthenticationException("Invalid login or password.");
@@ -42,7 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         AuthenticationToken token = generateToken(user.getId());
         user.setToken(token.getKey());
-        LOG.info(String.format("User %s logged successfully.", userEmail.email));
+        LOG.info(String.format("User %s logged successfully.", loginInfo.email));
         return new Token(token.getKey());
     }
 

@@ -1,9 +1,13 @@
 package com.teamdev.chatservice;
 
+import com.teamdev.chat.persistence.AuthenticationTokenRepository;
 import com.teamdev.chat.persistence.UserRepository;
+import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserDTO;
+import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
@@ -19,6 +23,8 @@ public class UserServiceTest {
     private UserService userService;
     private UserRepository userRepository;
 
+    private AuthenticationTokenRepository tokenRepository;
+
     private User user1;
     private UserDTO userDTO = new UserDTO("Vasya", "vasya@gmail.com", "pwd");
 
@@ -29,6 +35,8 @@ public class UserServiceTest {
         userService = context.getBean(UserService.class);
         userRepository = context.getBean(UserRepository.class);
         user1 = new User("Vasya", "vasya@gmail.com", "pwd1");
+
+        tokenRepository = context.getBean(AuthenticationTokenRepository.class);
     }
 
     @Test
@@ -79,8 +87,10 @@ public class UserServiceTest {
     @Test
     public void testFindUserById() throws UserNotFoundException {
         userRepository.update(user1);
+        AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
+        tokenRepository.update(authenticationToken);
 
-        UserDTO userDTO = userService.findById(new UserId(user1.getId()));
+        UserDTO userDTO = userService.findById(new Token(authenticationToken.getKey()), new UserId(user1.getId()), new UserId(user1.getId()));
         assertNotNull("UserDTO must exist.", userDTO);
     }
 }

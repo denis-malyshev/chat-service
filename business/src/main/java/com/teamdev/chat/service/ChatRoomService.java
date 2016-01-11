@@ -21,6 +21,6 @@ public interface ChatRoomService {
     void leaveChatRoom(Token token, UserId userId, ChatRoomId chatRoomId)
             throws AuthenticationException, ChatRoomNotFoundException, UserNotFoundException;
 
-    ArrayList<ChatRoomDTO> findAll();
+    ArrayList<ChatRoomDTO> findAll(Token token, UserId userId);
 
 }

@@ -3,9 +3,8 @@ package com.teamdev.chatservice;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.AuthenticationService;
+import com.teamdev.chat.service.impl.dto.LoginInfo;
 import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserEmail;
-import com.teamdev.chat.service.impl.dto.UserPassword;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class AuthenticationServerTest {
         userRepository.update(new User("Vasya", "vasya@gmail.com", createHash("pwd")));
 
         try {
-            Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
+            Token token = tokenService.login(new LoginInfo("vasya@gmail.com", "pwd"));
             assertNotNull("Token must exists.", token);
         } catch (AuthenticationException e) {
             fail("Unexpected exception.");
@@ -44,7 +43,7 @@ public class AuthenticationServerTest {
     public void testLoginUserWithInvalidEmail() {
 
         try {
-            tokenService.login(new UserEmail("invalid@gmail.com"), new UserPassword("pwd"));
+            tokenService.login(new LoginInfo("invalid@gmail.com", "pwd"));
         } catch (AuthenticationException e) {
             String result = e.getMessage();
             assertEquals("Exception message must be correct.", "Invalid login or password.", result);
@@ -56,7 +55,7 @@ public class AuthenticationServerTest {
         userRepository.update(new User("Vasya", "vasya@gmail.com", createHash("pwd")));
 
         try {
-            Token token = tokenService.login(new UserEmail("vasya@gmail.com"), new UserPassword("pwd"));
+            Token token = tokenService.login(new LoginInfo("vasya@gmail.com", "pwd"));
             tokenService.logout(token);
         } catch (AuthenticationException e) {
             fail("Unexpected exception.");

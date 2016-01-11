@@ -4,7 +4,10 @@ import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
+import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserDTO;
+import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
@@ -39,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
         LOG.info(format("Registration user %s.", userDTO.email));
 
-        emailValidation(new UserEmail(userDTO.email));
+        emailValidation(userDTO.email);
 
         if (userRepository.userCount() > 0 && userRepository.findByMail(userDTO.email) != null) {
             throw new AuthenticationException("User with the same mail already exists.");
@@ -54,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findById(UserId userId) throws UserNotFoundException {
+    public UserDTO findById(Token token, UserId searcherId, UserId userId) throws UserNotFoundException {
         LOG.info(format("Trying to find user with id[%d].", userId.id));
         User user = userRepository.findById(userId.id);
 
@@ -78,11 +81,11 @@ public class UserServiceImpl implements UserService {
                 collect(Collectors.toCollection(ArrayList<ChatRoomDTO>::new));
     }
 
-    private void emailValidation(UserEmail email) throws RegistrationException {
+    private void emailValidation(String email) throws RegistrationException {
         LOG.info("Checking an email address is correct or not.");
 
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(email.email);
+        Matcher matcher = pattern.matcher(email);
 
         if (!matcher.matches()) {
             throw new RegistrationException("Enter a correct email.");
