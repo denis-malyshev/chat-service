@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static com.teamdev.utils.PasswordHasher.createHash;
+import static com.teamdev.utils.Hasher.createHash;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -60,9 +60,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
 
         if (innerToken == null || innerToken.getUserId() != userId.id) {
+            LOG.error("Invalid token.");
             throw new AuthenticationException("Invalid token.");
         }
         if (innerToken.getExpirationTime().compareTo(LocalDateTime.now()) < 1) {
+            LOG.error("Token has been expired.");
             throw new AuthenticationException("Token has been expired.");
         }
 

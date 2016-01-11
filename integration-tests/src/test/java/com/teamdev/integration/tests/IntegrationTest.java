@@ -5,13 +5,13 @@ import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
 import com.teamdev.utils.JsonHelper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ public class IntegrationTest {
     private static final long validUserId = 1;
 
     @Before
-    public void setUp() {
+    public void setUp() throws URISyntaxException {
 
         httpClient = HttpClients.createDefault();
         validTokenKey = String.valueOf(LocalDateTime.now().getDayOfYear()) + validUserId;
