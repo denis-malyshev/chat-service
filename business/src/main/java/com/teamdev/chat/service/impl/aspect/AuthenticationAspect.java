@@ -3,7 +3,6 @@ package com.teamdev.chat.service.impl.aspect;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserId;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,13 +24,13 @@ public class AuthenticationAspect {
     }
 
     @Around("authPointcut()")
-    public void authentication(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object authentication(ProceedingJoinPoint joinPoint) throws Throwable {
 
         Token token = (Token) joinPoint.getArgs()[0];
         UserId userId = (UserId) joinPoint.getArgs()[1];
 
         authenticationService.validate(token, userId);
 
-        joinPoint.proceed();
+        return joinPoint.proceed();
     }
 }
