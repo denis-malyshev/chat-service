@@ -23,8 +23,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public User findByMail(String mail) {
-        User user = users.values().stream().filter(x -> x.getEmail().equals(mail)).findFirst().orElse(null);
-        return user;
+        return users.values().stream().filter(x -> x.getEmail().equals(mail)).findFirst().orElse(null);
     }
 
     public Collection<User> findAll() {

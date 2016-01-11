@@ -1,5 +1,7 @@
 package com.teamdev.chat.persistence.dom;
 
+import com.teamdev.utils.Hasher;
+
 import java.time.LocalDateTime;
 
 public class AuthenticationToken {
@@ -16,8 +18,7 @@ public class AuthenticationToken {
     public AuthenticationToken(long userId) {
         this.expirationTime = LocalDateTime.now().plusMinutes(15l);
         this.userId = userId;
-        //this.key = (System.nanoTime() * Math.random() + userId) + "";
-        this.key = LocalDateTime.now().getDayOfYear() + "" + userId;
+        this.key = Hasher.createHash(System.nanoTime() * Math.random() * 100 + userId + "");
     }
 
     public long getId() {
