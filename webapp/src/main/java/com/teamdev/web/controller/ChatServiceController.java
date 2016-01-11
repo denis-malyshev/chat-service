@@ -2,13 +2,10 @@ package com.teamdev.web.controller;
 
 import com.teamdev.chat.service.ChatRoomService;
 import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.dto.ChatRoomId;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserId;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import com.teamdev.web.requset.ChatRoomRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,26 +21,28 @@ public final class ChatServiceController {
     @Autowired
     private ChatRoomService chatRoomService;
 
-    @RequestMapping(value = "/chats/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/chats/all", params = {"token", "userId"}, method = RequestMethod.GET)
     @ResponseBody
-    public ArrayList<ChatRoomDTO> readAllChats_get() {
-        return chatRoomService.findAll();
+    public ResponseEntity<ArrayList<ChatRoomDTO>> readAll(@RequestParam String token, @RequestParam long userId) {
+        return new ResponseEntity<>(chatRoomService.findAll(new Token(token), new UserId(userId)), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/chats", params = {"token", "userId", "chatRoomId"})
-    @ResponseBody
-    public String deleteUserFromChat(@RequestParam String token, @RequestParam long userId, @RequestParam long chatRoomId)
-            throws ChatRoomNotFoundException, UserNotFoundException, AuthenticationException {
-        chatRoomService.leaveChatRoom(new Token(token), new UserId(userId), new ChatRoomId(chatRoomId));
-        return "User successfully deleted from chat";
-    }
+//    @RequestMapping(value = "/users/delete", method = RequestMethod.PUT)
+//    @ResponseBody
+//    public String deleteUserFromChat(@RequestBody )
+//            throws ChatRoomNotFoundException, UserNotFoundException, AuthenticationException {
+//        chatRoomService.leaveChatRoom(new Token(token), new UserId(userId), new ChatRoomId(chatRoomId));
+//        return "User successfully deleted from chat";
+//    }
 
-    @RequestMapping(value = "/create/{name}", params = {"token", "userId"}, method = RequestMethod.GET)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<ChatRoomDTO> createChat(@RequestParam String token, @RequestParam long userId, @PathVariable String name)
+    public ResponseEntity<ChatRoomDTO> createChat(@RequestBody ChatRoomRequest roomRequest)
             throws ChatRoomAlreadyExistsException {
-        ChatRoomDTO chatRoomDTO = chatRoomService.create(new Token(token), new UserId(userId), name);
-        return new ResponseEntity<>(chatRoomDTO, HttpStatus.OK);
+        return new ResponseEntity<>(chatRoomService.create(
+                roomRequest.tokenRequest.token,
+                roomRequest.tokenRequest.userId,
+                roomRequest.name), HttpStatus.OK);
     }
 
 

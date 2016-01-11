@@ -12,9 +12,9 @@ public final class ExceptionHandlingController {
 
     private static final Logger LOG = Logger.getLogger(ExceptionHandlingController.class);
 
-    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(AuthenticationException.class)
-    public void exceptionHandle() {
-        LOG.error("AuthenticationException -----------------------------");
+    public void exceptionHandle(AuthenticationException e) {
+        LOG.error("AuthenticationException: ", e);
     }
 }

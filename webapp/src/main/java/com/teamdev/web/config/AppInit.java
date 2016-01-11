@@ -1,5 +1,12 @@
 package com.teamdev.web.config;
 
+import com.teamdev.chat.service.AuthenticationService;
+import com.teamdev.chat.service.ChatRoomService;
+import com.teamdev.chat.service.UserService;
+import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.exception.*;
+import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -11,10 +18,27 @@ import javax.servlet.ServletRegistration;
 
 public class AppInit implements WebApplicationInitializer {
 
+    private static final Logger LOG = Logger.getLogger(AppInit.class);
+
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(ApplicationConfig.class);
+        rootContext.refresh();
+
+        try {
+            generateSampleData(rootContext);
+        } catch (ChatRoomAlreadyExistsException e) {
+            LOG.error("ChatRoomAlreadyExistsException: ", e);
+        } catch (AuthenticationException e) {
+            LOG.error("AuthenticationException: ", e);
+        } catch (RegistrationException e) {
+            LOG.error("RegistrationException: ", e);
+        } catch (UserNotFoundException e) {
+            LOG.error("UserNotFoundException: ", e);
+        } catch (ChatRoomNotFoundException e) {
+            LOG.error("ChatRoomNotFoundException: ", e);
+        }
 
         servletContext.addListener(new ContextLoaderListener(rootContext));
 
@@ -24,5 +48,22 @@ public class AppInit implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherServlet));
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
+    }
+
+    private void generateSampleData(ApplicationContext context) throws ChatRoomAlreadyExistsException, AuthenticationException, RegistrationException, UserNotFoundException, ChatRoomNotFoundException {
+
+        UserService userService = context.getBean(UserService.class);
+
+        UserDTO userDTO = new UserDTO("Vasya", "vasya1@gmail.com", "pwd");
+        UserDTO registeredUser = userService.register(userDTO);
+
+        LoginInfo loginInfo = new LoginInfo(userDTO.email, userDTO.password);
+
+        AuthenticationService tokenService = context.getBean(AuthenticationService.class);
+        Token token = tokenService.login(loginInfo);
+
+        ChatRoomService chatRoomService = context.getBean(ChatRoomService.class);
+        ChatRoomDTO chatRoomDTO = chatRoomService.create(token, new UserId(registeredUser.id), "test-chat");
+        chatRoomService.joinToChatRoom(token, new UserId(registeredUser.id), new ChatRoomId(chatRoomDTO.id));
     }
 }
