@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 public interface UserService {
 
-    UserDTO register(UserName name, UserEmail email, UserPassword password)
+    UserDTO register(UserDTO userDTO)
             throws AuthenticationException, RegistrationException;
 
     UserDTO findById(UserId userId) throws UserNotFoundException;
 
-    ArrayList<ChatRoomDTO> findAvailableChats(UserId userId);
+    ArrayList<ChatRoomDTO> findAvailableChats(Token token, UserId userId);
 }

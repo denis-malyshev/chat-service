@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.teamdev.utils.PasswordHasher.createHash;
+import static com.teamdev.utils.Hasher.createHash;
 import static org.junit.Assert.*;
 
 public class AuthenticationServerTest {

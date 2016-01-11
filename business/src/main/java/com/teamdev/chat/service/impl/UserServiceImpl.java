@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.teamdev.utils.PasswordHasher.createHash;
+import static com.teamdev.utils.Hasher.createHash;
 import static java.lang.String.format;
 
 @Service
@@ -34,20 +34,20 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl() {
     }
 
-    public UserDTO register(UserName name, UserEmail email, UserPassword password)
+    public UserDTO register(UserDTO userDTO)
             throws AuthenticationException, RegistrationException {
 
-        LOG.info(format("Registration user %s.", email.email));
+        LOG.info(format("Registration user %s.", userDTO.email));
 
-        emailValidation(email);
+        emailValidation(new UserEmail(userDTO.email));
 
-        if (userRepository.userCount() > 0 && userRepository.findByMail(email.email) != null) {
+        if (userRepository.userCount() > 0 && userRepository.findByMail(userDTO.email) != null) {
             throw new AuthenticationException("User with the same mail already exists.");
         }
 
-        String passwordHash = createHash(password.password);
+        String passwordHash = createHash(userDTO.password);
 
-        User user = new User(name.name, email.email, passwordHash);
+        User user = new User(userDTO.firstName, userDTO.email, passwordHash);
         userRepository.update(user);
         LOG.info(format("User %s successfully registered.", user.getFirstName()));
         return new UserDTO(user.getId(), user.getFirstName(), user.getEmail());
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ArrayList<ChatRoomDTO> findAvailableChats(UserId userId) {
+    public ArrayList<ChatRoomDTO> findAvailableChats(Token token, UserId userId) {
         Set<ChatRoom> chatRooms = userRepository.findById(userId.id).getChatRooms();
         return chatRooms.stream().
                 map(chatRoom -> new ChatRoomDTO(

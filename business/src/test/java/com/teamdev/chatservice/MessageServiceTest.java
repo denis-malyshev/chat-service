@@ -1,5 +1,6 @@
 package com.teamdev.chatservice;
 
+import com.teamdev.chat.persistence.AuthenticationTokenRepository;
 import com.teamdev.chat.persistence.ChatRoomRepository;
 import com.teamdev.chat.persistence.MessageRepository;
 import com.teamdev.chat.persistence.UserRepository;
@@ -8,6 +9,7 @@ import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.MessageService;
 import com.teamdev.chat.service.impl.dto.ChatRoomId;
+import com.teamdev.chat.service.impl.dto.MessageDTO;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
@@ -24,6 +26,7 @@ public class MessageServiceTest {
 
     private MessageService messageService;
     private MessageRepository messageRepository;
+    private AuthenticationTokenRepository tokenRepository;
 
     private UserId senderId;
     private UserId recipientId;
@@ -54,13 +57,17 @@ public class MessageServiceTest {
         senderId = new UserId(user1.getId());
         recipientId = new UserId(user2.getId());
 
-        token = new Token(new AuthenticationToken(user1.getId()).getKey());
+        AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
+        tokenRepository = context.getBean(AuthenticationTokenRepository.class);
+        tokenRepository.update(authenticationToken);
+        token = new Token(authenticationToken.getKey());
     }
 
     @Test
     public void testSendMessage_MessageRepositoryCanNotBeEmpty() {
         try {
-            messageService.sendMessage(token, senderId, chatRoomId, "Hello, Masha!");
+            MessageDTO messageDTO = messageService.sendMessage(token, senderId, chatRoomId, "Hello, Masha!");
+            System.out.println("messageDTO = " + messageDTO);
             boolean result = messageRepository.findAll().isEmpty();
             assertFalse(result);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {

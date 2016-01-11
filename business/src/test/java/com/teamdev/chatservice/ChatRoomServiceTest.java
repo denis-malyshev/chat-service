@@ -58,6 +58,7 @@ public class ChatRoomServiceTest {
     public void testCreateChat() {
         try {
             ChatRoomDTO chatRoomDTO = chatRoomService.create(token, userId, "chat");
+            System.out.println("chatRoomDTO = " + chatRoomDTO);
             assertNotNull("ChatRoomDTO must exists.", chatRoomDTO);
         } catch (ChatRoomAlreadyExistsException e) {
             fail("Unexpected exception.");

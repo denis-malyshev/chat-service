@@ -20,6 +20,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     private User user1;
+    private UserDTO userDTO = new UserDTO("Vasya", "vasya@gmail.com", "pwd");
 
     @Before
     public void setUp() throws Exception {
@@ -33,10 +34,7 @@ public class UserServiceTest {
     @Test
     public void testRegistrationUser() {
         try {
-            userService.register(
-                    new UserName(user1.getFirstName()),
-                    new UserEmail(user1.getEmail()),
-                    new UserPassword(user1.getPassword()));
+            userService.register(userDTO);
 
             int result = userRepository.userCount();
             assertEquals("User must be exist.", 1, result);
@@ -50,10 +48,7 @@ public class UserServiceTest {
         userRepository.update(user1);
 
         try {
-            userService.register(
-                    new UserName(user1.getFirstName()),
-                    new UserEmail(user1.getEmail()),
-                    new UserPassword(user1.getPassword()));
+            userService.register(userDTO);
 
             fail();
         } catch (AuthenticationException e) {
@@ -67,10 +62,10 @@ public class UserServiceTest {
     @Test
     public void testRegistrationUserWithIncorrectEmail() {
         try {
-            userService.register(
-                    new UserName(user1.getFirstName()),
-                    new UserEmail("bla-bla-bla-po4ta.com"),
-                    new UserPassword(user1.getPassword()));
+
+            UserDTO invalidUserDTO = new UserDTO("Vasya", "vasya-gmail.com", "pwd");
+
+            userService.register(invalidUserDTO);
 
             fail();
         } catch (AuthenticationException e) {
