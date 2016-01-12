@@ -8,7 +8,7 @@ import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
-import com.teamdev.web.requset.TokenRequest;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,31 +21,40 @@ import java.util.ArrayList;
 @Controller
 public final class UserServiceController {
 
+    private static final Logger LOG = Logger.getLogger(UserServiceController.class);
+
     @Autowired
     private UserService userService;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO)
-            throws AuthenticationException, RegistrationException {
-        return new ResponseEntity<>(userService.register(userDTO), HttpStatus.OK);
+    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO) {
+        try {
+            return new ResponseEntity<>(userService.register(userDTO), HttpStatus.OK);
+        } catch (AuthenticationException | RegistrationException e) {
+            LOG.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
-    @RequestMapping(value = "/find/{userId}", params = {"token", "userId"}, method = RequestMethod.GET)
+    @RequestMapping(value = "/find/{id}", params = {"token", "userId"}, method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<UserDTO> findById(@RequestParam String token, @RequestParam long searcherId, @PathVariable long userId)
-            throws AuthenticationException, RegistrationException, UserNotFoundException {
-        return new ResponseEntity<>(userService.findById(
-                new Token(token),
-                new UserId(searcherId),
-                new UserId(userId)), HttpStatus.OK);
+    public ResponseEntity<UserDTO> findById(@RequestParam String token, @RequestParam long userId, @PathVariable long id) {
+        try {
+            return new ResponseEntity<>(userService.findById(
+                    new Token(token),
+                    new UserId(userId),
+                    new UserId(id)), HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            LOG.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
-    @RequestMapping(value = "/find", method = RequestMethod.POST)
+    @RequestMapping(value = "/chats", params = {"token", "userId"}, method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<ArrayList<ChatRoomDTO>> findAvailableChats(@RequestBody TokenRequest tokenRequest)
-            throws AuthenticationException, RegistrationException, UserNotFoundException {
-        return new ResponseEntity<>(userService.findAvailableChats(tokenRequest.token, tokenRequest.userId), HttpStatus.OK);
+    public ResponseEntity<ArrayList<ChatRoomDTO>> findAvailableChats(@RequestParam String token, @RequestParam long userId) {
+        return new ResponseEntity<>(userService.findAvailableChats(new Token(token), new UserId(userId)), HttpStatus.OK);
     }
 
 }

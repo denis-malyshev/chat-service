@@ -9,6 +9,7 @@ import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import com.teamdev.web.requset.MessageRequest;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,34 +23,44 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class MessageServiceController {
 
+    private static final Logger LOG = Logger.getLogger(MessageServiceController.class);
+
     @Autowired
     private MessageService messageService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<MessageDTO> sendMessage(@RequestBody MessageRequest messageRequest)
-            throws UserNotFoundException, ChatRoomNotFoundException, AuthenticationException {
-        Token token = messageRequest.tokenRequest.token;
-        UserId userId = messageRequest.tokenRequest.userId;
+    public ResponseEntity<MessageDTO> sendMessage(@RequestBody MessageRequest messageRequest) {
+        Token token = messageRequest.token;
+        UserId userId = messageRequest.userId;
         ChatRoomId chatRoomId = new ChatRoomId(messageRequest.receiverId);
-        return new ResponseEntity<>(messageService.sendMessage(
-                token,
-                userId,
-                chatRoomId,
-                messageRequest.text), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(messageService.sendMessage(
+                    token,
+                    userId,
+                    chatRoomId,
+                    messageRequest.text), HttpStatus.OK);
+        } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
+            LOG.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @RequestMapping(value = "/send_private", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<MessageDTO> sendPrivateMessage(@RequestBody MessageRequest messageRequest)
-            throws UserNotFoundException, ChatRoomNotFoundException, AuthenticationException {
-        Token token = messageRequest.tokenRequest.token;
-        UserId userId = messageRequest.tokenRequest.userId;
+    public ResponseEntity<MessageDTO> sendPrivateMessage(@RequestBody MessageRequest messageRequest) {
+        Token token = messageRequest.token;
+        UserId userId = messageRequest.userId;
         UserId receiverId = new UserId(messageRequest.receiverId);
-        return new ResponseEntity<>(messageService.sendPrivateMessage(
-                token,
-                userId,
-                receiverId,
-                messageRequest.text), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(messageService.sendPrivateMessage(
+                    token,
+                    userId,
+                    receiverId,
+                    messageRequest.text), HttpStatus.OK);
+        } catch (AuthenticationException | UserNotFoundException e) {
+            LOG.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }
