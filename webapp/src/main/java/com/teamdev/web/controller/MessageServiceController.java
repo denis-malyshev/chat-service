@@ -8,7 +8,7 @@ import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
-import com.teamdev.web.requset.MessageRequest;
+import com.teamdev.web.wrappers.MessageRequest;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

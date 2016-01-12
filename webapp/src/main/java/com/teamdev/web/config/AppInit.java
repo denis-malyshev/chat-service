@@ -28,16 +28,12 @@ public class AppInit implements WebApplicationInitializer {
 
         try {
             generateSampleData(rootContext);
-        } catch (ChatRoomAlreadyExistsException e) {
-            LOG.error("ChatRoomAlreadyExistsException: ", e);
-        } catch (AuthenticationException e) {
-            LOG.error("AuthenticationException: ", e);
-        } catch (RegistrationException e) {
-            LOG.error("RegistrationException: ", e);
-        } catch (UserNotFoundException e) {
-            LOG.error("UserNotFoundException: ", e);
-        } catch (ChatRoomNotFoundException e) {
-            LOG.error("ChatRoomNotFoundException: ", e);
+        } catch (ChatRoomAlreadyExistsException |
+                ChatRoomNotFoundException |
+                UserNotFoundException |
+                RegistrationException |
+                AuthenticationException e) {
+            LOG.error(e.getMessage(), e);
         }
 
         servletContext.addListener(new ContextLoaderListener(rootContext));

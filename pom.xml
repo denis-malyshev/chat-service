@@ -17,8 +17,8 @@
     <modules>
         <module>business</module>
         <module>persistence</module>
-        <module>webapp</module>
         <module>integration-tests</module>
+        <module>webapp</module>
         <module>utils</module>
     </modules>
 

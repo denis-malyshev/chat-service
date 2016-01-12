@@ -7,7 +7,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import javax.annotation.PostConstruct;
 
 @EnableAspectJAutoProxy
-@ComponentScan(basePackages = {"com.teamdev.chat.service.impl", "com.teamdev.chat.persistence", "com.teamdev.web.controller"})
+@ComponentScan(basePackages = {"com.teamdev.chat.service.impl", "com.teamdev.chat.persistence"})
 public class ApplicationConfig {
 
     private static final Logger LOG = Logger.getLogger(ApplicationConfig.class);

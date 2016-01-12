@@ -12,6 +12,7 @@
     <groupId>com.teamdev.integration</groupId>
     <artifactId>integration-tests</artifactId>
     <version>1.0</version>
+    <packaging>pom</packaging>
 
     <profiles>
         <profile>
