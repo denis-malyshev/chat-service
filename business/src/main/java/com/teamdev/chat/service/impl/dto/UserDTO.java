@@ -22,6 +22,22 @@ public class UserDTO {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserDTO userDTO = (UserDTO) o;
+
+        return id == userDTO.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("UserDTO{");
         sb.append("firstName='").append(firstName).append('\'');
