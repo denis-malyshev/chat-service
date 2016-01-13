@@ -2,8 +2,6 @@ package com.teamdev.integration.tests;
 
 import com.google.common.reflect.TypeToken;
 import com.teamdev.chat.service.impl.dto.*;
-import com.teamdev.utils.HttpResponseConverter;
-import com.teamdev.utils.JsonHelper;
 import com.teamdev.web.wrappers.ChatRoomRequest;
 import com.teamdev.web.wrappers.UpdateChatRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -14,16 +12,15 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.login;
-import static com.teamdev.utils.HttpResponseConverter.*;
-import static com.teamdev.utils.JsonHelper.*;
+import static com.teamdev.utils.HttpResponseConverter.contentToString;
+import static com.teamdev.utils.JsonHelper.fromJson;
+import static com.teamdev.utils.JsonHelper.toJson;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,13 +42,9 @@ public class ChatRoomServiceTest {
     private static CloseableHttpClient httpClient;
     private Token token;
 
-    @BeforeClass
-    public static void beforeClass() throws URISyntaxException {
-        httpClient = HttpClients.createDefault();
-    }
-
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
+        httpClient = HttpClients.createDefault();
         token = login(TEST_LOGIN_INFO, httpClient);
     }
 
@@ -70,8 +63,10 @@ public class ChatRoomServiceTest {
         httpPost.setEntity(new StringEntity(toJson(chatRoomRequest)));
 
         CloseableHttpResponse response = httpClient.execute(httpPost);
+        String message = contentToString(response);
         int result = response.getStatusLine().getStatusCode();
-        assertEquals(409, result);
+        assertEquals("Error code must be correct.", 409, result);
+        assertEquals("Error message must be correct.", format("ChatRoom %s already exists.", TEST_CHAT_NAME), message);
     }
 
     @Test
@@ -81,7 +76,7 @@ public class ChatRoomServiceTest {
         String json = contentToString(response);
         ArrayList<ChatRoomDTO> chatRoomDTOs = fromJson(json, new TypeToken<ArrayList<ChatRoomDTO>>() {
         }.getType());
-        assertNotNull(chatRoomDTOs);
+        assertNotNull("ChatRooms must exists.", chatRoomDTOs);
     }
 
     @Test
@@ -99,7 +94,7 @@ public class ChatRoomServiceTest {
 
         CloseableHttpResponse response = httpClient.execute(httpPut);
         String result = contentToString(response);
-        assertEquals("User successfully joined to chat.", result);
+        assertEquals("Message must be correct.", "User successfully joined to chat.", result);
     }
 
     @Test
@@ -114,8 +109,10 @@ public class ChatRoomServiceTest {
         httpPut.setEntity(new StringEntity(toJson(updateChatRequest)));
 
         CloseableHttpResponse response = httpClient.execute(httpPut);
+        String message = contentToString(response);
         int result = response.getStatusLine().getStatusCode();
-        assertEquals(404, result);
+        assertEquals("Error code must be correct.", 404, result);
+        assertEquals("Error message must be correct.", "ChatRoom with this id [999] not exists.", message);
     }
 
     @Test
@@ -131,7 +128,7 @@ public class ChatRoomServiceTest {
 
         CloseableHttpResponse response = httpClient.execute(httpPut);
         String result = contentToString(response);
-        assertEquals("User successfully deleted from chat.", result);
+        assertEquals("Message must be correct.", "User successfully deleted from chat.", result);
     }
 
     public static ChatRoomDTO create(ChatRoomRequest chatRoomRequest, CloseableHttpClient httpClient) throws IOException {
