@@ -1,7 +1,7 @@
 package com.teamdev.integration.tests;
 
 import com.teamdev.chat.service.impl.dto.*;
-import com.teamdev.integration.tests.wrappers.MessageRequest;
+import com.teamdev.chatservice.wrappers.MessageRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;

@@ -1,4 +1,4 @@
-package com.teamdev.integration.tests.wrappers;
+package com.teamdev.chatservice.wrappers;
 
 import com.teamdev.chat.service.impl.dto.ChatRoomId;
 import com.teamdev.chat.service.impl.dto.Token;

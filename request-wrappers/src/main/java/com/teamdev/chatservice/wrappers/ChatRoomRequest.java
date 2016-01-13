@@ -1,4 +1,4 @@
-package com.teamdev.web.wrappers;
+package com.teamdev.chatservice.wrappers;
 
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserId;
