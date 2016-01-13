@@ -18,6 +18,8 @@ import java.net.URISyntaxException;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.login;
 import static com.teamdev.integration.tests.UserServiceTest.register;
+import static com.teamdev.utils.HttpResponseConverter.*;
+import static com.teamdev.utils.JsonHelper.*;
 import static org.junit.Assert.assertEquals;
 
 public class MessageServiceTest {
@@ -49,27 +51,52 @@ public class MessageServiceTest {
         HttpPost httpPost = new HttpPost(SEND_URL);
         MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, TEST_CHAT_ID.id, "Hello!");
         httpPost.setHeader("Content-Type", "application/json");
-        httpPost.setEntity(new StringEntity(JsonHelper.toJson(messageRequest)));
+        httpPost.setEntity(new StringEntity(toJson(messageRequest)));
 
         CloseableHttpResponse response = httpClient.execute(httpPost);
-        String json = HttpResponseConverter.contentToString(response);
-        MessageDTO messageDTO = JsonHelper.fromJson(json, MessageDTO.class);
+        String json = contentToString(response);
+        MessageDTO messageDTO = fromJson(json, MessageDTO.class);
         assertEquals(messageRequest.text, messageDTO.text);
+    }
+
+    @Test
+    public void testSendMessageToNotExistingChat() throws IOException {
+        HttpPost httpPost = new HttpPost(SEND_URL);
+        MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, 999, "Hello!");
+        httpPost.setHeader("Content-Type", "application/json");
+        httpPost.setEntity(new StringEntity(toJson(messageRequest)));
+
+        CloseableHttpResponse response = httpClient.execute(httpPost);
+        int result = response.getStatusLine().getStatusCode();
+        assertEquals(404, result);
     }
 
     @Test
     public void testSendPrivateMessage() throws IOException {
         UserDTO userDTO = new UserDTO("Serega", "serega@gmail.com", "pwd");
-        UserDTO registeredUser = register(userDTO, httpClient);
+        CloseableHttpResponse httpResponse = register(userDTO, httpClient);
+        UserDTO registeredUser = fromJson(contentToString(httpResponse), UserDTO.class);
 
         HttpPost httpPost = new HttpPost(SEND_PRIVATE_URL);
         MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, registeredUser.id, "Hello!");
         httpPost.setHeader("Content-Type", "application/json");
-        httpPost.setEntity(new StringEntity(JsonHelper.toJson(messageRequest)));
+        httpPost.setEntity(new StringEntity(toJson(messageRequest)));
 
         CloseableHttpResponse response = httpClient.execute(httpPost);
-        String json = HttpResponseConverter.contentToString(response);
-        MessageDTO messageDTO = JsonHelper.fromJson(json, MessageDTO.class);
+        String json = contentToString(response);
+        MessageDTO messageDTO = fromJson(json, MessageDTO.class);
         assertEquals(messageRequest.text, messageDTO.text);
+    }
+
+    @Test
+    public void testSendPrivateMessageToNotExistingUser() throws IOException {
+        HttpPost httpPost = new HttpPost(SEND_PRIVATE_URL);
+        MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, 999, "Hello!");
+        httpPost.setHeader("Content-Type", "application/json");
+        httpPost.setEntity(new StringEntity(toJson(messageRequest)));
+
+        CloseableHttpResponse response = httpClient.execute(httpPost);
+        int result = response.getStatusLine().getStatusCode();
+        assertEquals(404, result);
     }
 }

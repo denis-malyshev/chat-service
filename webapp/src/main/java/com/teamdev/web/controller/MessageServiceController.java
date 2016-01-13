@@ -30,7 +30,8 @@ public class MessageServiceController {
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<MessageDTO> sendMessage(@RequestBody MessageRequest messageRequest) {
+    public ResponseEntity<MessageDTO> sendMessage(@RequestBody MessageRequest messageRequest)
+            throws UserNotFoundException, ChatRoomNotFoundException, AuthenticationException {
         Token token = messageRequest.token;
         UserId userId = messageRequest.userId;
         ChatRoomId chatRoomId = new ChatRoomId(messageRequest.receiverId);
@@ -42,13 +43,14 @@ public class MessageServiceController {
                     messageRequest.text), HttpStatus.OK);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
     }
 
     @RequestMapping(value = "/send_private", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<MessageDTO> sendPrivateMessage(@RequestBody MessageRequest messageRequest) {
+    public ResponseEntity<MessageDTO> sendPrivateMessage(@RequestBody MessageRequest messageRequest)
+            throws AuthenticationException, UserNotFoundException {
         Token token = messageRequest.token;
         UserId userId = messageRequest.userId;
         UserId receiverId = new UserId(messageRequest.receiverId);
@@ -60,7 +62,7 @@ public class MessageServiceController {
                     messageRequest.text), HttpStatus.OK);
         } catch (AuthenticationException | UserNotFoundException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
     }
 }

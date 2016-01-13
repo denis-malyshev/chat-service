@@ -28,7 +28,7 @@ public final class AuthenticationServiceController {
             return new ResponseEntity<>(token, HttpStatus.OK);
         } catch (AuthenticationException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
     }
 

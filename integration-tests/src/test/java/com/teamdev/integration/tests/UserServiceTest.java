@@ -5,7 +5,6 @@ import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
 import com.teamdev.chat.service.impl.dto.LoginInfo;
 import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserDTO;
-import com.teamdev.utils.HttpResponseConverter;
 import com.teamdev.utils.JsonHelper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -21,6 +20,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.login;
+import static com.teamdev.utils.HttpResponseConverter.contentToString;
+import static com.teamdev.utils.JsonHelper.*;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,21 +46,30 @@ public class UserServiceTest {
     @Test
     public void testRegisterUser() throws IOException {
         UserDTO registerDTO = new UserDTO("Vasya", "vasya@gmail.com", "pwd");
-        UserDTO userDTO = register(registerDTO, httpClient);
+        CloseableHttpResponse response = register(registerDTO, httpClient);
+        UserDTO userDTO = fromJson(contentToString(response), UserDTO.class);
         assertEquals(registerDTO.email, userDTO.email);
+    }
+
+    @Test
+    public void testRegisterUserWithIncorrectEmail() throws IOException {
+        UserDTO registerDTO = new UserDTO("Vasya", "vasya-gmail.com", "pwd");
+        CloseableHttpResponse response = register(registerDTO, httpClient);
+        int result = response.getStatusLine().getStatusCode();
+        assertEquals(409, result);
     }
 
     @Test
     public void testFindById() throws IOException {
         UserDTO registerDTO = new UserDTO("Masha", "masha@gmail.com", "pwd");
-        UserDTO registeredDTO = register(registerDTO, httpClient);
+        CloseableHttpResponse httpResponse = register(registerDTO, httpClient);
+        UserDTO registeredDTO = fromJson(contentToString(httpResponse), UserDTO.class);
 
         Token token = login(new LoginInfo(registerDTO.email, registerDTO.password), httpClient);
 
         HttpGet httpGet = new HttpGet(format("%s/%d?token=%s&userId=%d", FIND_URL, registeredDTO.id, token.key, registeredDTO.id));
         CloseableHttpResponse response = httpClient.execute(httpGet);
-        String json = HttpResponseConverter.contentToString(response);
-        UserDTO userDTO = JsonHelper.fromJson(json, UserDTO.class);
+        UserDTO userDTO = fromJson(contentToString(response), UserDTO.class);
         assertEquals(registeredDTO, userDTO);
     }
 
@@ -69,20 +79,18 @@ public class UserServiceTest {
 
         HttpGet httpGet = new HttpGet(format("%s/?token=%s&userId=%d", FIND_CHATS_URL, token.key, TEST_USER_ID));
         CloseableHttpResponse response = httpClient.execute(httpGet);
-        String json = HttpResponseConverter.contentToString(response);
-        ArrayList<ChatRoomDTO> availableChats = JsonHelper.fromJson(json, new TypeToken<ArrayList<ChatRoomDTO>>() {
+        String json = contentToString(response);
+        ArrayList<ChatRoomDTO> availableChats = fromJson(json, new TypeToken<ArrayList<ChatRoomDTO>>() {
         }.getType());
 
         assertNotNull(availableChats);
     }
 
-    public static UserDTO register(UserDTO userDTO, CloseableHttpClient httpClient) throws IOException {
+    public static CloseableHttpResponse register(UserDTO userDTO, CloseableHttpClient httpClient) throws IOException {
         HttpPost httpPost = new HttpPost(REGISTER_URL);
         httpPost.setHeader("Content-Type", "application/json");
-        httpPost.setEntity(new StringEntity(JsonHelper.toJson(userDTO)));
+        httpPost.setEntity(new StringEntity(toJson(userDTO)));
 
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-        String json = HttpResponseConverter.contentToString(response);
-        return JsonHelper.fromJson(json, UserDTO.class);
+        return httpClient.execute(httpPost);
     }
 }

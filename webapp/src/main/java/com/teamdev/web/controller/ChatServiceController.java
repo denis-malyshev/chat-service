@@ -36,7 +36,8 @@ public final class ChatServiceController {
 
     @RequestMapping(value = "/join", method = RequestMethod.PUT)
     @ResponseBody
-    public String joinUserToChat(@RequestBody UpdateChatRequest updateChatRequest) {
+    public String joinUserToChat(@RequestBody UpdateChatRequest updateChatRequest)
+            throws UserNotFoundException, ChatRoomNotFoundException, AuthenticationException {
         try {
             chatRoomService.joinToChatRoom(
                     updateChatRequest.token,
@@ -44,14 +45,15 @@ public final class ChatServiceController {
                     updateChatRequest.chatRoomId);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
         return "User successfully joined to chat.";
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.PUT)
     @ResponseBody
-    public String deleteUserFromChat(@RequestBody UpdateChatRequest updateChatRequest) {
+    public String deleteUserFromChat(@RequestBody UpdateChatRequest updateChatRequest)
+            throws ChatRoomNotFoundException, UserNotFoundException, AuthenticationException {
         try {
             chatRoomService.leaveChatRoom(
                     updateChatRequest.token,
@@ -59,14 +61,15 @@ public final class ChatServiceController {
                     updateChatRequest.chatRoomId);
         } catch (AuthenticationException | ChatRoomNotFoundException | UserNotFoundException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
         return "User successfully deleted from chat.";
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<ChatRoomDTO> createChat(@RequestBody ChatRoomRequest roomRequest) {
+    public ResponseEntity<ChatRoomDTO> createChat(@RequestBody ChatRoomRequest roomRequest)
+            throws ChatRoomAlreadyExistsException {
         try {
             return new ResponseEntity<>(chatRoomService.create(
                     roomRequest.token,
@@ -74,7 +77,7 @@ public final class ChatServiceController {
                     roomRequest.name), HttpStatus.OK);
         } catch (ChatRoomAlreadyExistsException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
     }
 

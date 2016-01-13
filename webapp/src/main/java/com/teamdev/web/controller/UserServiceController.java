@@ -28,18 +28,19 @@ public final class UserServiceController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO)
+            throws AuthenticationException, RegistrationException {
         try {
             return new ResponseEntity<>(userService.register(userDTO), HttpStatus.OK);
         } catch (AuthenticationException | RegistrationException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
     }
 
     @RequestMapping(value = "/find/{id}", params = {"token", "userId"}, method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<UserDTO> findById(@RequestParam String token, @RequestParam long userId, @PathVariable long id) {
+    public ResponseEntity<UserDTO> findById(@RequestParam String token, @RequestParam long userId, @PathVariable long id) throws UserNotFoundException {
         try {
             return new ResponseEntity<>(userService.findById(
                     new Token(token),
@@ -47,7 +48,7 @@ public final class UserServiceController {
                     new UserId(id)), HttpStatus.OK);
         } catch (UserNotFoundException e) {
             LOG.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
     }
 
