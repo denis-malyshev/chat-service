@@ -39,7 +39,6 @@ public class AuthenticationServiceTest {
     @Test
     public void testLogin() throws IOException {
         Token token = login(VALID_LOGIN_INFO, httpClient);
-        System.out.println("token = " + token.key);
         assertNotNull("Token must exists.", token);
     }
 
