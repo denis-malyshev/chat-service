@@ -8,11 +8,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class AuthenticationServiceTest {
-
+    private static final Logger LOG = Logger.getLogger(AuthenticationServiceTest.class);
     private static final String HOME_URL = "http://localhost:8080/chat-service";
     private static final String AUTHENTICATION_SERVICE_URL = HOME_URL + "/auth";
     private static final String LOGIN_URL = AUTHENTICATION_SERVICE_URL + "/login";
@@ -32,44 +32,59 @@ public class AuthenticationServiceTest {
     private static CloseableHttpClient httpClient;
 
     @Before
-    public void setUp() throws URISyntaxException {
+    public void setUp() {
         httpClient = HttpClients.createDefault();
     }
 
     @Test
-    public void testLogin() throws IOException {
-        Token token = login(VALID_LOGIN_INFO, httpClient);
-        assertNotNull("Token must exists.", token);
+    public void testLogin() {
+        try {
+            Token token = getTokenFromResponse(login(VALID_LOGIN_INFO));
+            assertNotNull("Token must exists.", token);
+        } catch (IOException e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 
     @Test
-    public void testLogout() throws IOException {
-        Token token = login(VALID_LOGIN_INFO, httpClient);
-        String result = logout(token.key);
-        assertEquals("Message must be correct.", "successfully", result);
+    public void testLogout() {
+        try {
+            Token token = getTokenFromResponse(login(VALID_LOGIN_INFO));
+            String result = logout(token.key);
+            assertEquals("Message must be correct.", "successfully", result);
+        } catch (IOException e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 
     @Test
-    public void testLoginWithInvalidPassword() throws Exception {
-        HttpPost httpPost = new HttpPost(LOGIN_URL);
-        httpPost.setHeader("Content-Type", "application/json");
-        httpPost.setEntity(new StringEntity(toJson(INVALID_LOGIN_INFO)));
+    public void testLoginWithInvalidPassword() {
+        try {
+            HttpPost httpPost = new HttpPost(LOGIN_URL);
+            httpPost.setHeader("Content-Type", "application/json");
+            httpPost.setEntity(new StringEntity(toJson(INVALID_LOGIN_INFO)));
 
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-        String message = contentToString(response);
-        int result = response.getStatusLine().getStatusCode();
-        assertEquals("Error code must be correct.", 403, result);
-        assertEquals("Error message must be correct.", "Invalid login or password.", message);
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String message = contentToString(response);
+            int result = response.getStatusLine().getStatusCode();
+            assertEquals("Error code must be correct.", 403, result);
+            assertEquals("Error message must be correct.", "Invalid login or password.", message);
+        } catch (IOException e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 
-    public static Token login(LoginInfo loginInfo, CloseableHttpClient httpClient) throws IOException {
+    public static CloseableHttpResponse login(LoginInfo loginInfo) throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(LOGIN_URL);
         httpPost.setHeader("Content-Type", "application/json");
         httpPost.setEntity(new StringEntity(toJson(loginInfo)));
 
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-        String json = contentToString(response);
-        return fromJson(json, Token.class);
+        return httpClient.execute(httpPost);
+    }
+
+    public static Token getTokenFromResponse(CloseableHttpResponse response) throws IOException {
+        return fromJson(contentToString(response), Token.class);
     }
 
     private String logout(String token) throws IOException {
