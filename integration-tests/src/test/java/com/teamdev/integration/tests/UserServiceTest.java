@@ -1,10 +1,8 @@
 package com.teamdev.integration.tests;
 
 import com.google.gson.reflect.TypeToken;
-import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.dto.LoginInfo;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserDTO;
+import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chatservice.wrappers.ChatRoomRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -20,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.getTokenFromResponse;
+import static com.teamdev.integration.tests.ChatRoomServiceTest.*;
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
@@ -47,7 +46,11 @@ public class UserServiceTest {
                     "userservice@gmail.com",
                     "userservice");
             testUserDTO = getUserFromResponse(register(userDTO));
-            testToken = getTokenFromResponse(AuthenticationServiceTest.login(new LoginInfo(userDTO.email, userDTO.password)));
+            testToken = getTokenFromResponse(AuthenticationServiceTest.login(
+                    new LoginInfo(userDTO.email, userDTO.password)));
+            ChatRoomDTO testChatDTO = getChatFromResponse(create(
+                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), "testChatForUserService")));
+            joinUserToChat(testToken, new UserId(testUserDTO.id), new ChatRoomId(testChatDTO.id));
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -61,7 +64,7 @@ public class UserServiceTest {
     @Test
     public void testRegisterUser() {
         try {
-            UserDTO registerDTO = new UserDTO("Vasya", "vasya@gmail.com", "pwd");
+            UserDTO registerDTO = new UserDTO("Vasya", "vasya23@gmail.com", "pwd");
             CloseableHttpResponse response = register(registerDTO);
             UserDTO userDTO = getUserFromResponse(response);
             assertEquals("Emails must be equals.", registerDTO.email, userDTO.email);

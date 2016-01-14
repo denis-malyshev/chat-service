@@ -13,13 +13,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.getTokenFromResponse;
-import static com.teamdev.integration.tests.AuthenticationServiceTest.login;
+import static com.teamdev.integration.tests.UserServiceTest.getUserFromResponse;
+import static com.teamdev.integration.tests.UserServiceTest.register;
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
@@ -36,28 +38,43 @@ public class ChatRoomServiceTest {
     private static final String JOIN_URL = CHAT_SERVICE_URL + "/join";
     private static final String DELETE_URL = CHAT_SERVICE_URL + "/delete";
 
-    private static final LoginInfo TEST_LOGIN_INFO = new LoginInfo("vasya1@gmail.com", "pwd");
-    private static final UserId TEST_USER_ID = new UserId(1);
-    private static final ChatRoomId TEST_CHAT_ID = new ChatRoomId(1);
-    private static final String TEST_CHAT_NAME = "test-chat";
+    private static UserDTO testUserDTO;
+    private static UserId testUserId;
+    private static Token testToken;
+    private static ChatRoomDTO testChatDTO;
+    private static ChatRoomId testChatRoomId;
 
     private static CloseableHttpClient httpClient;
-    private Token token;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void beforeClass() {
         try {
-            httpClient = HttpClients.createDefault();
-            token = getTokenFromResponse(login(TEST_LOGIN_INFO));
+            UserDTO userDTO = new UserDTO(
+                    "Vasya",
+                    "chatservice@gmail.com",
+                    "pwd");
+            testUserDTO = getUserFromResponse(register(userDTO));
+            testToken = getTokenFromResponse(AuthenticationServiceTest.login(
+                    new LoginInfo(userDTO.email, userDTO.password)));
+            testChatDTO = getChatFromResponse(create(
+                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), "testChatForChatService")));
+            testUserId = new UserId(testUserDTO.id);
+            testChatRoomId = new ChatRoomId(testChatDTO.id);
+            joinUserToChat(testToken, testUserId, testChatRoomId);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
     }
 
+    @Before
+    public void setUp() {
+        httpClient = HttpClients.createDefault();
+    }
+
     @Test
     public void testCreateChat() {
         try {
-            ChatRoomRequest chatRoomRequest = new ChatRoomRequest(token, TEST_USER_ID, "chat-1");
+            ChatRoomRequest chatRoomRequest = new ChatRoomRequest(testToken, testUserId, "chat-2");
             ChatRoomDTO chatRoomDTO = getChatFromResponse(create(chatRoomRequest));
             assertEquals(chatRoomRequest.name, chatRoomDTO.name);
         } catch (IOException e) {
@@ -68,7 +85,7 @@ public class ChatRoomServiceTest {
     @Test
     public void testCreateChatWithExistingName() {
         try {
-            ChatRoomRequest chatRoomRequest = new ChatRoomRequest(token, TEST_USER_ID, TEST_CHAT_NAME);
+            ChatRoomRequest chatRoomRequest = new ChatRoomRequest(testToken, testUserId, testChatDTO.name);
             HttpPost httpPost = new HttpPost(CREATE_URL);
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(new StringEntity(toJson(chatRoomRequest)));
@@ -77,7 +94,7 @@ public class ChatRoomServiceTest {
             String message = contentToString(response);
             int result = response.getStatusLine().getStatusCode();
             assertEquals("Error code must be correct.", 409, result);
-            assertEquals("Error message must be correct.", format("ChatRoom %s already exists.", TEST_CHAT_NAME), message);
+            assertEquals("Error message must be correct.", format("ChatRoom %s already exists.", testChatDTO.name), message);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -86,7 +103,7 @@ public class ChatRoomServiceTest {
     @Test
     public void testReadAllChats() {
         try {
-            HttpGet httpGet = new HttpGet(format("%s/?token=%s&userId=%d", FIND_ALL_URL, token.key, TEST_USER_ID.id));
+            HttpGet httpGet = new HttpGet(format("%s/?token=%s&userId=%d", FIND_ALL_URL, testToken.key, testUserDTO.id));
             CloseableHttpResponse response = httpClient.execute(httpGet);
             String json = contentToString(response);
             ArrayList<ChatRoomDTO> chatRoomDTOs = fromJson(json, new TypeToken<ArrayList<ChatRoomDTO>>() {
@@ -100,18 +117,7 @@ public class ChatRoomServiceTest {
     @Test
     public void testJoinUserToChat() {
         try {
-            ChatRoomRequest chatRoomRequest = new ChatRoomRequest(token, TEST_USER_ID, "chat-2");
-            ChatRoomDTO chatRoomDTO = getChatFromResponse(create(chatRoomRequest));
-            UpdateChatRequest updateChatRequest = new UpdateChatRequest(
-                    token,
-                    TEST_USER_ID,
-                    new ChatRoomId(chatRoomDTO.id));
-
-            HttpPut httpPut = new HttpPut(JOIN_URL);
-            httpPut.setHeader("Content-Type", "application/json");
-            httpPut.setEntity(new StringEntity(toJson(updateChatRequest)));
-
-            CloseableHttpResponse response = httpClient.execute(httpPut);
+            CloseableHttpResponse response = joinUserToChat(testToken, testUserId, testChatRoomId);
             String result = contentToString(response);
             assertEquals("Message must be correct.", "User successfully joined to chat.", result);
         } catch (IOException e) {
@@ -122,20 +128,11 @@ public class ChatRoomServiceTest {
     @Test
     public void testJoinUserToNotExistingChat() {
         try {
-            UpdateChatRequest updateChatRequest = new UpdateChatRequest(
-                    token,
-                    TEST_USER_ID,
-                    new ChatRoomId(999));
-
-            HttpPut httpPut = new HttpPut(JOIN_URL);
-            httpPut.setHeader("Content-Type", "application/json");
-            httpPut.setEntity(new StringEntity(toJson(updateChatRequest)));
-
-            CloseableHttpResponse response = httpClient.execute(httpPut);
+            CloseableHttpResponse response = joinUserToChat(testToken, testUserId, new ChatRoomId(2938456));
             String message = contentToString(response);
             int result = response.getStatusLine().getStatusCode();
             assertEquals("Error code must be correct.", 404, result);
-            assertEquals("Error message must be correct.", "ChatRoom with this id [999] not exists.", message);
+            assertEquals("Error message must be correct.", "ChatRoom with this id [2938456] not exists.", message);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -145,9 +142,9 @@ public class ChatRoomServiceTest {
     public void testDeleteUserFromChat() {
         try {
             UpdateChatRequest updateChatRequest = new UpdateChatRequest(
-                    token,
-                    TEST_USER_ID,
-                    TEST_CHAT_ID);
+                    testToken,
+                    testUserId,
+                    testChatRoomId);
 
             HttpPut httpPut = new HttpPut(DELETE_URL);
             httpPut.setHeader("Content-Type", "application/json");
@@ -172,5 +169,16 @@ public class ChatRoomServiceTest {
 
     public static ChatRoomDTO getChatFromResponse(CloseableHttpResponse response) throws IOException {
         return fromJson(contentToString(response), ChatRoomDTO.class);
+    }
+
+    public static CloseableHttpResponse joinUserToChat(Token token, UserId userId, ChatRoomId chatRoomId) throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        UpdateChatRequest updateChatRequest = new UpdateChatRequest(token, userId, chatRoomId);
+
+        HttpPut httpPut = new HttpPut(JOIN_URL);
+        httpPut.setHeader("Content-Type", "application/json");
+        httpPut.setEntity(new StringEntity(toJson(updateChatRequest)));
+
+        return httpClient.execute(httpPut);
     }
 }

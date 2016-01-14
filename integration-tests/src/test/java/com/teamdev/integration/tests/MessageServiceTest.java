@@ -1,6 +1,7 @@
 package com.teamdev.integration.tests;
 
 import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chatservice.wrappers.ChatRoomRequest;
 import com.teamdev.chatservice.wrappers.MessageRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -9,12 +10,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.getTokenFromResponse;
-import static com.teamdev.integration.tests.AuthenticationServiceTest.login;
+import static com.teamdev.integration.tests.ChatRoomServiceTest.*;
+import static com.teamdev.integration.tests.UserServiceTest.getUserFromResponse;
 import static com.teamdev.integration.tests.UserServiceTest.register;
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
@@ -28,28 +31,42 @@ public class MessageServiceTest {
     private static final String SEND_URL = MESSAGE_SERVICE_URL + "/send";
     private static final String SEND_PRIVATE_URL = MESSAGE_SERVICE_URL + "/send_private";
 
-    private static final LoginInfo TEST_LOGIN_INFO = new LoginInfo("vasya1@gmail.com", "pwd");
-    private static final UserId TEST_USER_ID = new UserId(1);
-    private static final ChatRoomId TEST_CHAT_ID = new ChatRoomId(1);
+    private static UserId testUserId;
+    private static Token testToken;
+    private static ChatRoomId testChatRoomId;
 
     private static CloseableHttpClient httpClient;
-    private Token token;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void beforeClass() {
         try {
-            httpClient = HttpClients.createDefault();
-            token = getTokenFromResponse(login(TEST_LOGIN_INFO));
+            UserDTO userDTO = new UserDTO(
+                    "VasyaFromMessageService",
+                    "messageservice@gmail.com",
+                    "messaheservice");
+            UserDTO testUserDTO = getUserFromResponse(register(userDTO));
+            testToken = getTokenFromResponse(AuthenticationServiceTest.login(
+                    new LoginInfo(userDTO.email, userDTO.password)));
+            ChatRoomDTO testChatDTO = getChatFromResponse(create(
+                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), "testChatForMessageService")));
+            testUserId = new UserId(testUserDTO.id);
+            testChatRoomId = new ChatRoomId(testChatDTO.id);
+            joinUserToChat(testToken, testUserId, testChatRoomId);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
+    }
+
+    @Before
+    public void setUp() {
+        httpClient = HttpClients.createDefault();
     }
 
     @Test
     public void testSendMessageToExistingChat() {
         try {
             HttpPost httpPost = new HttpPost(SEND_URL);
-            MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, TEST_CHAT_ID.id, "Hello!");
+            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, testChatRoomId.id, "Hello!");
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(new StringEntity(toJson(messageRequest)));
 
@@ -66,7 +83,7 @@ public class MessageServiceTest {
     public void testSendMessageToNotExistingChat() {
         try {
             HttpPost httpPost = new HttpPost(SEND_URL);
-            MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, 999, "Hello!");
+            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, 999, "Hello!");
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(new StringEntity(toJson(messageRequest)));
 
@@ -88,7 +105,7 @@ public class MessageServiceTest {
             UserDTO registeredUser = fromJson(contentToString(httpResponse), UserDTO.class);
 
             HttpPost httpPost = new HttpPost(SEND_PRIVATE_URL);
-            MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, registeredUser.id, "Hello!");
+            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, registeredUser.id, "Hello!");
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(new StringEntity(toJson(messageRequest)));
 
@@ -105,7 +122,7 @@ public class MessageServiceTest {
     public void testSendPrivateMessageToNotExistingUser() {
         try {
             HttpPost httpPost = new HttpPost(SEND_PRIVATE_URL);
-            MessageRequest messageRequest = new MessageRequest(token, TEST_USER_ID, 999, "Hello!");
+            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, 999, "Hello!");
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(new StringEntity(toJson(messageRequest)));
 
