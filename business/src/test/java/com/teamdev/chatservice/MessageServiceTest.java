@@ -67,7 +67,6 @@ public class MessageServiceTest {
     public void testSendMessage_MessageRepositoryCanNotBeEmpty() {
         try {
             MessageDTO messageDTO = messageService.sendMessage(token, senderId, chatRoomId, "Hello, Masha!");
-            System.out.println("messageDTO = " + messageDTO);
             boolean result = messageRepository.findAll().isEmpty();
             assertFalse(result);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
