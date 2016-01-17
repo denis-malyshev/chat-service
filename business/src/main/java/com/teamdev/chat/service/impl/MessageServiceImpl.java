@@ -18,6 +18,13 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class MessageServiceImpl implements MessageService {
 
@@ -72,6 +79,17 @@ public class MessageServiceImpl implements MessageService {
 
         LOG.info("Message sent successfully.");
         return new MessageDTO(message.getId(), message.getText(), message.getTime());
+    }
+
+    @Override
+    public ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, LocalDateTime dateTime) {
+        List<Message> messages = messageRepository.findByTimeAfter(dateTime);
+        return messages.stream().map(message ->
+                new MessageDTO(
+                        message.getId(),
+                        message.getText(),
+                        message.getTime())).
+                collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
     }
 
     private ChatRoom getChatRoom(ChatRoomId chatRoomId) throws ChatRoomNotFoundException {

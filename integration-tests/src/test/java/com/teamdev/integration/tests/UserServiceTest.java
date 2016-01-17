@@ -23,9 +23,7 @@ import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
 import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class UserServiceTest {
     private static final Logger LOG = Logger.getLogger(UserServiceTest.class);

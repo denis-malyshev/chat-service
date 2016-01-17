@@ -9,6 +9,7 @@ import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import com.teamdev.chatservice.wrappers.MessageRequest;
+import com.teamdev.chatservice.wrappers.ReadMessagesRequest;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
 
 @RequestMapping("/message")
 @Controller
@@ -32,14 +35,11 @@ public class MessageServiceController {
     @ResponseBody
     public ResponseEntity<MessageDTO> sendMessage(@RequestBody MessageRequest messageRequest)
             throws UserNotFoundException, ChatRoomNotFoundException, AuthenticationException {
-        Token token = messageRequest.token;
-        UserId userId = messageRequest.userId;
-        ChatRoomId chatRoomId = new ChatRoomId(messageRequest.receiverId);
         try {
             return new ResponseEntity<>(messageService.sendMessage(
-                    token,
-                    userId,
-                    chatRoomId,
+                    messageRequest.token,
+                    messageRequest.userId,
+                    new ChatRoomId(messageRequest.receiverId),
                     messageRequest.text), HttpStatus.OK);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
             LOG.error(e.getMessage(), e);
@@ -51,16 +51,27 @@ public class MessageServiceController {
     @ResponseBody
     public ResponseEntity<MessageDTO> sendPrivateMessage(@RequestBody MessageRequest messageRequest)
             throws AuthenticationException, UserNotFoundException {
-        Token token = messageRequest.token;
-        UserId userId = messageRequest.userId;
-        UserId receiverId = new UserId(messageRequest.receiverId);
         try {
             return new ResponseEntity<>(messageService.sendPrivateMessage(
-                    token,
-                    userId,
-                    receiverId,
+                    messageRequest.token,
+                    messageRequest.userId,
+                    new UserId(messageRequest.receiverId),
                     messageRequest.text), HttpStatus.OK);
         } catch (AuthenticationException | UserNotFoundException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @RequestMapping(value = "/find_all_after", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<ArrayList<MessageDTO>> findAllAfterDate(@RequestBody ReadMessagesRequest readMessagesRequest) {
+        try {
+            return new ResponseEntity<>(messageService.findAllAfterDate(
+                    readMessagesRequest.token,
+                    readMessagesRequest.userId,
+                    readMessagesRequest.dateTime), HttpStatus.OK);
+        } catch (AuthenticationException e) {
             LOG.error(e.getMessage(), e);
             throw e;
         }

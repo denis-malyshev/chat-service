@@ -6,6 +6,7 @@ import com.teamdev.chat.persistence.MessageRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.AuthenticationToken;
 import com.teamdev.chat.persistence.dom.ChatRoom;
+import com.teamdev.chat.persistence.dom.Message;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.MessageService;
 import com.teamdev.chat.service.impl.dto.ChatRoomId;
@@ -20,6 +21,9 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
 public class MessageServiceTest {
@@ -30,8 +34,11 @@ public class MessageServiceTest {
     private UserId recipientId;
 
     private ChatRoomId chatRoomId;
+    private MessageRepository messageRepository;
 
     private Token token;
+    private User user1;
+    private User user2;
 
     @Before
     public void setUp() {
@@ -40,13 +47,14 @@ public class MessageServiceTest {
         messageService = context.getBean(MessageService.class);
         UserRepository userRepository = context.getBean(UserRepository.class);
         ChatRoomRepository chatRoomRepository = context.getBean(ChatRoomRepository.class);
+        messageRepository = context.getBean(MessageRepository.class);
 
         ChatRoom chatRoom = new ChatRoom("test-chat");
         chatRoomRepository.save(chatRoom);
         chatRoomId = new ChatRoomId(chatRoom.getId());
 
-        User user1 = new User("Vasya", "vasya.message.service@gmail.com", "pwd1");
-        User user2 = new User("Masha", "masha.message.service@gmail.com", "pwd");
+        user1 = new User("Vasya", "vasya.message.service@gmail.com", "pwd1");
+        user2 = new User("Masha", "masha.message.service@gmail.com", "pwd");
 
         userRepository.save(user1);
         userRepository.save(user2);
@@ -100,5 +108,12 @@ public class MessageServiceTest {
             String result = e.getMessage();
             assertEquals("Exception message must be correct.", "User with this id [999] not exists.", result);
         }
+    }
+
+    @Test
+    public void testFindAllAfterDate() throws Exception {
+        messageRepository.save(new Message("Hello", user1, user2));
+        ArrayList<MessageDTO> result = messageService.findAllAfterDate(token, senderId, LocalDateTime.now().minusHours(1L));
+        assertNotNull("Result can't be null.", result);
     }
 }
