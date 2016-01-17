@@ -26,8 +26,7 @@ import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
 import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class ChatRoomServiceTest {
     private static final Logger LOG = Logger.getLogger(ChatRoomServiceTest.class);
@@ -78,7 +77,7 @@ public class ChatRoomServiceTest {
             ChatRoomDTO chatRoomDTO = getChatFromResponse(create(chatRoomRequest));
             assertEquals(chatRoomRequest.name, chatRoomDTO.name);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -96,7 +95,7 @@ public class ChatRoomServiceTest {
             assertEquals("Error code must be correct.", 409, result);
             assertEquals("Error message must be correct.", format("ChatRoom %s already exists.", testChatDTO.name), message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -110,7 +109,7 @@ public class ChatRoomServiceTest {
             }.getType());
             assertNotNull("ChatRooms must exists.", chatRoomDTOs);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -121,7 +120,7 @@ public class ChatRoomServiceTest {
             String result = contentToString(response);
             assertEquals("Message must be correct.", "User successfully joined to chat.", result);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -134,7 +133,8 @@ public class ChatRoomServiceTest {
             assertEquals("Error code must be correct.", 404, result);
             assertEquals("Error message must be correct.", "ChatRoom with this id [2938456] not exists.", message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail();
+            fail("Unexpected exception.");
         }
     }
 
@@ -154,7 +154,7 @@ public class ChatRoomServiceTest {
             String result = contentToString(response);
             assertEquals("Message must be correct.", "User successfully deleted from chat.", result);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 

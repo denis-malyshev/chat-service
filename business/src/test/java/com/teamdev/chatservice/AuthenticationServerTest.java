@@ -29,10 +29,10 @@ public class AuthenticationServerTest {
 
     @Test
     public void testLoginUser() {
-        userRepository.update(new User("Vasya", "vasya@gmail.com", createHash("pwd")));
+        userRepository.save(new User("Vasya", "vasya.auth.service@gmail.com", createHash("pwd")));
 
         try {
-            Token token = tokenService.login(new LoginInfo("vasya@gmail.com", "pwd"));
+            Token token = tokenService.login(new LoginInfo("vasya.auth.service@gmail.com", "pwd"));
             assertNotNull("Token must exists.", token);
         } catch (AuthenticationException e) {
             fail("Unexpected exception.");
@@ -52,7 +52,7 @@ public class AuthenticationServerTest {
 
     @Test
     public void testLogout() {
-        userRepository.update(new User("Vasya", "vasya@gmail.com", createHash("pwd")));
+        userRepository.save(new User("Vasya", "vasya@gmail.com", createHash("pwd")));
 
         try {
             Token token = tokenService.login(new LoginInfo("vasya@gmail.com", "pwd"));

@@ -23,6 +23,7 @@ import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class MessageServiceTest {
     private static final Logger LOG = Logger.getLogger(MessageServiceTest.class);
@@ -76,6 +77,7 @@ public class MessageServiceTest {
             assertEquals("ChatRoom names must be equals.", messageRequest.text, messageDTO.text);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -94,6 +96,7 @@ public class MessageServiceTest {
             assertEquals("Error message must be correct.", "ChatRoom with this id [999] not exists.", message);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -115,6 +118,7 @@ public class MessageServiceTest {
             assertEquals("Text messages must be equals.", messageRequest.text, messageDTO.text);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -133,6 +137,7 @@ public class MessageServiceTest {
             assertEquals("Error message must be correct.", "User with this id [999] not exists.", message);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 }

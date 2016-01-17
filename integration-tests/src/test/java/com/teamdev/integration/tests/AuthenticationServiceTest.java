@@ -21,6 +21,7 @@ import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class AuthenticationServiceTest {
     private static final Logger LOG = Logger.getLogger(AuthenticationServiceTest.class);
@@ -44,7 +45,7 @@ public class AuthenticationServiceTest {
             validLoginInfo = new LoginInfo(userDTO.email, userDTO.password);
             getUserFromResponse(register(userDTO));
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -57,9 +58,10 @@ public class AuthenticationServiceTest {
     public void testLogin() {
         try {
             Token token = getTokenFromResponse(login(validLoginInfo));
+            System.out.println(token);
             assertNotNull("Token must exists.", token);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -70,7 +72,7 @@ public class AuthenticationServiceTest {
             String result = logout(token.key);
             assertEquals("Message must be correct.", "successfully", result);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 
@@ -87,7 +89,7 @@ public class AuthenticationServiceTest {
             assertEquals("Error code must be correct.", 403, result);
             assertEquals("Error message must be correct.", "Invalid login or password.", message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
+            fail("Unexpected exception.");
         }
     }
 

@@ -25,8 +25,6 @@ import static org.junit.Assert.*;
 public class MessageServiceTest {
 
     private MessageService messageService;
-    private MessageRepository messageRepository;
-    private AuthenticationTokenRepository tokenRepository;
 
     private UserId senderId;
     private UserId recipientId;
@@ -40,26 +38,25 @@ public class MessageServiceTest {
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
 
         messageService = context.getBean(MessageService.class);
-        messageRepository = context.getBean(MessageRepository.class);
         UserRepository userRepository = context.getBean(UserRepository.class);
         ChatRoomRepository chatRoomRepository = context.getBean(ChatRoomRepository.class);
 
         ChatRoom chatRoom = new ChatRoom("test-chat");
-        chatRoomRepository.update(chatRoom);
+        chatRoomRepository.save(chatRoom);
         chatRoomId = new ChatRoomId(chatRoom.getId());
 
-        User user1 = new User("Vasya", "vasya@gmail.com", "pwd1");
-        User user2 = new User("Masha", "masha@gmail.com", "pwd");
+        User user1 = new User("Vasya", "vasya.message.service@gmail.com", "pwd1");
+        User user2 = new User("Masha", "masha.message.service@gmail.com", "pwd");
 
-        userRepository.update(user1);
-        userRepository.update(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
 
         senderId = new UserId(user1.getId());
         recipientId = new UserId(user2.getId());
 
         AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
-        tokenRepository = context.getBean(AuthenticationTokenRepository.class);
-        tokenRepository.update(authenticationToken);
+        AuthenticationTokenRepository tokenRepository = context.getBean(AuthenticationTokenRepository.class);
+        tokenRepository.save(authenticationToken);
         token = new Token(authenticationToken.getKey());
     }
 
@@ -67,8 +64,7 @@ public class MessageServiceTest {
     public void testSendMessage_MessageRepositoryCanNotBeEmpty() {
         try {
             MessageDTO messageDTO = messageService.sendMessage(token, senderId, chatRoomId, "Hello, Masha!");
-            boolean result = messageRepository.findAll().isEmpty();
-            assertFalse(result);
+            assertNotNull(messageDTO);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
             fail("Unexpected exception.");
         }
@@ -77,9 +73,8 @@ public class MessageServiceTest {
     @Test
     public void testSendPrivateMessage_MessageRepositoryCanNotBeEmpty() {
         try {
-            messageService.sendPrivateMessage(token, senderId, recipientId, "Hello, Masha!");
-            boolean result = messageRepository.findAll().isEmpty();
-            assertFalse(result);
+            MessageDTO messageDTO = messageService.sendPrivateMessage(token, senderId, recipientId, "Hello");
+            assertNotNull(messageDTO);
         } catch (AuthenticationException | UserNotFoundException e) {
             fail("Unexpected exception.");
         }

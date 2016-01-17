@@ -26,7 +26,7 @@ public class UserServiceTest {
     private AuthenticationTokenRepository tokenRepository;
 
     private User user1;
-    private UserDTO userDTO = new UserDTO("Vasya", "vasya@gmail.com", "pwd");
+    private UserDTO userDTO = new UserDTO("Vasya", "vasya.user.service@gmail.com", "pwd");
 
     @Before
     public void setUp() throws Exception {
@@ -34,7 +34,7 @@ public class UserServiceTest {
 
         userService = context.getBean(UserService.class);
         userRepository = context.getBean(UserRepository.class);
-        user1 = new User("Vasya", "vasya@gmail.com", "pwd1");
+        user1 = new User("Vasya", "vasya.user.service@gmail.com", "pwd1");
 
         tokenRepository = context.getBean(AuthenticationTokenRepository.class);
     }
@@ -42,10 +42,9 @@ public class UserServiceTest {
     @Test
     public void testRegistrationUser() {
         try {
-            userService.register(userDTO);
+            UserDTO register = userService.register(new UserDTO("Vasya", "vasya.use1r.service@gmail.com", "pwd"));
 
-            int result = userRepository.userCount();
-            assertEquals("User must be exist.", 1, result);
+            assertNotNull("User must be exist.",register);
         } catch (AuthenticationException | RegistrationException e) {
             fail("Unexpected exception.");
         }
@@ -53,7 +52,7 @@ public class UserServiceTest {
 
     @Test
     public void testRegistrationUserWithExistingEmail() {
-        userRepository.update(user1);
+        userRepository.save(user1);
 
         try {
             userService.register(userDTO);
@@ -86,9 +85,9 @@ public class UserServiceTest {
 
     @Test
     public void testFindUserById() throws UserNotFoundException {
-        userRepository.update(user1);
+        userRepository.save(user1);
         AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
-        tokenRepository.update(authenticationToken);
+        tokenRepository.save(authenticationToken);
 
         UserDTO userDTO = userService.findById(new Token(authenticationToken.getKey()), new UserId(user1.getId()), new UserId(user1.getId()));
         assertNotNull("UserDTO must exist.", userDTO);
