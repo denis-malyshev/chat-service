@@ -1,10 +1,11 @@
 package com.teamdev.chat.persistence;
 
 import com.teamdev.chat.persistence.dom.User;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends Repository<User> {
+@Repository
+public interface UserRepository extends CrudRepository<User, Long> {
 
-    User findByMail(String mail);
-
-    int userCount();
+    User findByEmail(String email);
 }

@@ -1,20 +1,31 @@
 package com.teamdev.chat.persistence.dom;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Entity
+@Table(name = "USER")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "userId")
     private long id;
-
     private String firstName;
     private String email;
     private String password;
-
-    private String token;
+    @OneToOne(mappedBy = "user")
+    private AuthenticationToken token;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
     private List<Message> messages = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "USER_CHAT_ROOM",
+            joinColumns = {@JoinColumn(name = "userId", unique = true)},
+            inverseJoinColumns = {@JoinColumn(name = "chatRoomId", unique = true)})
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
     public User() {
@@ -26,11 +37,11 @@ public class User {
         this.password = password;
     }
 
-    public String getToken() {
+    public AuthenticationToken getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken(AuthenticationToken token) {
         this.token = token;
     }
 
@@ -101,7 +112,7 @@ public class User {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
         sb.append("id=").append(id);
         sb.append(", firstName=").append(firstName);

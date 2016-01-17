@@ -41,11 +41,13 @@ public class MessageServiceImpl implements MessageService {
         User user = getUser(userId);
         ChatRoom chatRoom = getChatRoom(chatRoomId);
 
-        Message message = new Message(text, user, chatRoom);
-        messageRepository.update(message);
+        Message message = messageRepository.save(new Message(text, user, chatRoom));
 
         user.getMessages().add(message);
         chatRoom.getMessages().add(message);
+
+        userRepository.save(user);
+        chatRoomRepository.save(chatRoom);
 
         LOG.info("Message sent successfully.");
         return new MessageDTO(message.getId(), message.getText(), message.getTime());
@@ -60,18 +62,20 @@ public class MessageServiceImpl implements MessageService {
         User sender = getUser(senderId);
         User receiver = getUser(receiverId);
 
-        Message message = new Message(text, sender, receiver);
-        messageRepository.update(message);
+        Message message = messageRepository.save(new Message(text, sender, receiver));
 
         sender.getMessages().add(message);
         receiver.getMessages().add(message);
+
+        userRepository.save(sender);
+        userRepository.save(receiver);
 
         LOG.info("Message sent successfully.");
         return new MessageDTO(message.getId(), message.getText(), message.getTime());
     }
 
     private ChatRoom getChatRoom(ChatRoomId chatRoomId) throws ChatRoomNotFoundException {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId.id);
+        ChatRoom chatRoom = chatRoomRepository.findOne(chatRoomId.id);
 
         if (chatRoom == null) {
             throw new ChatRoomNotFoundException(String.format("ChatRoom with this id [%d] not exists.", chatRoomId.id));
@@ -80,7 +84,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private User getUser(UserId userId) throws UserNotFoundException {
-        User user = userRepository.findById(userId.id);
+        User user = userRepository.findOne(userId.id);
 
         if (user == null) {
             throw new UserNotFoundException(String.format("User with this id [%d] not exists.", userId.id));

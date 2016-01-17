@@ -44,14 +44,14 @@ public class UserServiceImpl implements UserService {
 
         emailValidation(userDTO.email);
 
-        if (userRepository.userCount() > 0 && userRepository.findByMail(userDTO.email) != null) {
+        if (userRepository.count() > 0 && userRepository.findByEmail(userDTO.email) != null) {
             throw new AuthenticationException("User with the same mail already exists.");
         }
 
         String passwordHash = createHash(userDTO.password);
 
         User user = new User(userDTO.firstName, userDTO.email, passwordHash);
-        userRepository.update(user);
+        userRepository.save(user);
         LOG.info(format("User %s successfully registered.", user.getFirstName()));
         return new UserDTO(user.getId(), user.getFirstName(), user.getEmail());
     }
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findById(Token token, UserId searcherId, UserId userId) throws UserNotFoundException {
         LOG.info(format("Trying to find user with id[%d].", userId.id));
-        User user = userRepository.findById(userId.id);
+        User user = userRepository.findOne(userId.id);
 
         if (user == null) {
             throw new UserNotFoundException(format("User with id[%d] not exists.", userId.id));
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ArrayList<ChatRoomDTO> findAvailableChats(Token token, UserId userId) {
-        Set<ChatRoom> chatRooms = userRepository.findById(userId.id).getChatRooms();
+        Set<ChatRoom> chatRooms = userRepository.findOne(userId.id).getChatRooms();
         return chatRooms.stream().
                 map(chatRoom -> new ChatRoomDTO(
                         chatRoom.getId(),

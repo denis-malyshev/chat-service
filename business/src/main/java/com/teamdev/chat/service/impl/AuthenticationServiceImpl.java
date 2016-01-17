@@ -31,7 +31,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public Token login(LoginInfo loginInfo) throws AuthenticationException {
         LOG.info(String.format("User %s trying to login.", loginInfo.email));
-        User user = userRepository.findByMail(loginInfo.email);
+        User user = userRepository.findByEmail(loginInfo.email);
 
         String passwordHash = createHash(loginInfo.password);
 
@@ -40,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         AuthenticationToken token = generateToken(user.getId());
-        user.setToken(token.getKey());
+        user.setToken(token);
         LOG.info(String.format("User %s logged successfully.", loginInfo.email));
         return new Token(token.getKey());
     }
@@ -72,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private AuthenticationToken generateToken(long userId) {
         AuthenticationToken token = new AuthenticationToken(userId);
-        tokenRepository.update(token);
+        tokenRepository.save(token);
         return token;
     }
 }

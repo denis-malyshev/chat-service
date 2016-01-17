@@ -1,14 +1,21 @@
 package com.teamdev.chat.persistence.dom;
 
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "CHAT_ROOM")
 public class ChatRoom {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "chatRoomId")
     private long id;
-
     private String name;
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Message> messages = new HashSet<>();
+    @ManyToMany(mappedBy = "chatRooms", fetch = FetchType.EAGER)
     private Set<User> users = new HashSet<>();
 
     public ChatRoom() {
