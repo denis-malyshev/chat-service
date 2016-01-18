@@ -10,8 +10,6 @@ import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public interface MessageService {
 

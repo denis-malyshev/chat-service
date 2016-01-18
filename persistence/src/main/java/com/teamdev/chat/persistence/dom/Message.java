@@ -1,7 +1,5 @@
 package com.teamdev.chat.persistence.dom;
 
-import com.sun.istack.internal.NotNull;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -14,12 +12,10 @@ public class Message {
     @Column(name = "messageId")
     private long id;
     private LocalDateTime time;
-    @NotNull
     private String text;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User sender;
-    //    @ManyToOne(fetch = FetchType.EAGER)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User receiver;

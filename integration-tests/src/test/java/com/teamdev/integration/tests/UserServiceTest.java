@@ -68,7 +68,6 @@ public class UserServiceTest {
             UserDTO userDTO = getUserFromResponse(response);
             assertEquals("Emails must be equals.", registerDTO.email, userDTO.email);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -84,7 +83,6 @@ public class UserServiceTest {
             assertEquals(403, statusCode);
             assertEquals("Error message must be correct.", "User with the same mail already exists.", message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -99,7 +97,6 @@ public class UserServiceTest {
             assertEquals("Error code must be correct.", 409, result);
             assertEquals("Error message must be correct.", "Enter a correct email.", message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -116,7 +113,6 @@ public class UserServiceTest {
             UserDTO userDTO = fromJson(contentToString(response), UserDTO.class);
             assertEquals("UserDTOs must be equals.", registeredDTO, userDTO);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -131,7 +127,6 @@ public class UserServiceTest {
             assertEquals("Error code must be correct", 404, statusCode);
             assertEquals("Error message must be correct.", "User with id[999] not exists.", message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -147,7 +142,6 @@ public class UserServiceTest {
 
             assertNotNull("ChatRooms must exists.", availableChats);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
