@@ -58,7 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         LOG.info("Checking user token.");
         AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
 
-        if (innerToken == null || innerToken.getUserId() != userId.id) {
+        if (innerToken == null || innerToken.getUser().getId() != userId.id) {
             LOG.error("Invalid token.");
             throw new AuthenticationException("Invalid token.");
         }
