@@ -80,7 +80,6 @@ public class MessageServiceTest {
             MessageDTO messageDTO = fromJson(json, MessageDTO.class);
             assertEquals("ChatRoom names must be equals.", messageRequest.text, messageDTO.text);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -99,7 +98,6 @@ public class MessageServiceTest {
             assertEquals("Error code must be correct.", 404, result);
             assertEquals("Error message must be correct.", "ChatRoom with this id [999] not exists.", message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -121,7 +119,6 @@ public class MessageServiceTest {
             MessageDTO messageDTO = fromJson(json, MessageDTO.class);
             assertEquals("Text messages must be equals.", messageRequest.text, messageDTO.text);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -140,7 +137,6 @@ public class MessageServiceTest {
             assertEquals("Error code must be correct.", 404, result);
             assertEquals("Error message must be correct.", "User with this id [999] not exists.", message);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }
@@ -159,7 +155,6 @@ public class MessageServiceTest {
             }.getType());
             assertNotNull("Result can't be null.", result);
         } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
             fail("Unexpected exception.");
         }
     }

@@ -1,13 +1,14 @@
 package com.teamdev.integration.tests;
 
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.dto.LoginInfo;
+import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chat.service.impl.dto.UserDTO;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,12 +20,9 @@ import static com.teamdev.integration.tests.UserServiceTest.register;
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class AuthenticationServiceTest {
-    private static final Logger LOG = Logger.getLogger(AuthenticationServiceTest.class);
     private static final String HOME_URL = "http://localhost:8080/chat-service";
     private static final String AUTHENTICATION_SERVICE_URL = HOME_URL + "/auth";
     private static final String LOGIN_URL = AUTHENTICATION_SERVICE_URL + "/login";
