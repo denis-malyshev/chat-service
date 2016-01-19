@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AuthenticationTokenRepository extends CrudRepository<AuthenticationToken, Long> {
 
-    AuthenticationToken findByKey(String key);
+    AuthenticationToken findByTokenKey(String key);
 }

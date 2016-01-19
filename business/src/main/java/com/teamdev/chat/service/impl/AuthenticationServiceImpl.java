@@ -41,12 +41,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setToken(token);
         userRepository.save(user);
         LOG.info(String.format("User %s logged successfully.", loginInfo.email));
-        return new Token(token.getKey());
+        return new Token(token.getTokenKey());
     }
 
     @Override
     public void logout(Token token) {
-        AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
+        AuthenticationToken innerToken = tokenRepository.findByTokenKey(token.key);
         if (innerToken != null) {
             tokenRepository.delete(innerToken.getId());
         }
@@ -55,9 +55,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void validate(Token token, UserId userId) throws AuthenticationException {
         LOG.info("Checking user token.");
-        AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
-        System.out.println(innerToken.getUser().getId());
-        if (innerToken.getUser().getId() != userId.id) {
+        AuthenticationToken innerToken = tokenRepository.findByTokenKey(token.key);
+
+        if (innerToken.getUser() != null && innerToken.getUser().getId() != userId.id) {
             LOG.error("Invalid token.");
             throw new AuthenticationException("Invalid token.");
         }
@@ -70,7 +70,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private AuthenticationToken generateToken(User user) {
-        AuthenticationToken token = new AuthenticationToken(user);
+        AuthenticationToken token = new AuthenticationToken(user.getId());
+        token.setUser(user);
         tokenRepository.save(token);
         return token;
     }

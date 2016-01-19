@@ -62,10 +62,10 @@ public class MessageServiceTest {
         senderId = new UserId(user1.getId());
         recipientId = new UserId(user2.getId());
 
-        AuthenticationToken authenticationToken = new AuthenticationToken(user1);
+        AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
         AuthenticationTokenRepository tokenRepository = context.getBean(AuthenticationTokenRepository.class);
         tokenRepository.save(authenticationToken);
-        token = new Token(authenticationToken.getKey());
+        token = new Token(authenticationToken.getTokenKey());
     }
 
     @Test

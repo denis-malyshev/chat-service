@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "MESSAGE")
+@Table
 public class Message {
 
     @Id
@@ -43,10 +43,6 @@ public class Message {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public LocalDateTime getTime() {
         return time;
     }
@@ -65,10 +61,6 @@ public class Message {
 
     public ChatRoom getChat() {
         return chat;
-    }
-
-    public void setChat(ChatRoom chat) {
-        this.chat = chat;
     }
 
     @Override

@@ -56,7 +56,6 @@ public class AuthenticationServiceTest {
     public void testLogin() {
         try {
             Token token = getTokenFromResponse(login(validLoginInfo));
-            System.out.println(token);
             assertNotNull("Token must exists.", token);
         } catch (IOException e) {
             fail("Unexpected exception.");

@@ -7,25 +7,25 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "USER")
+@Table
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "userId")
     private long id;
     private String firstName;
     private String email;
     private String password;
-    @OneToOne(mappedBy = "user")
+    @OneToOne
+    @PrimaryKeyJoinColumn
     private AuthenticationToken token;
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
     private List<Message> messages = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "USER_CHAT_ROOM",
+    @JoinTable(name = "user_chat_room",
             joinColumns = {@JoinColumn(name = "userId", unique = true)},
-            inverseJoinColumns = {@JoinColumn(name = "chatRoomId", unique = true)})
+            inverseJoinColumns = {@JoinColumn(name = "chatRoomId")})
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
     User() {
@@ -53,10 +53,6 @@ public class User {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -67,10 +63,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Set<ChatRoom> getChatRooms() {

@@ -5,7 +5,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.util.Properties;
 
 @Configuration
 @ComponentScan("com.teamdev.chat.service.impl")
@@ -33,15 +31,6 @@ public class ApplicationConfig {
         return builder.setType(EmbeddedDatabaseType.HSQL).build();
     }
 
-//    @Bean
-//    public DataSource dataSource() {
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-//        dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/mydb");
-//        dataSource.setUsername("root");
-//        dataSource.setPassword("");
-//        return dataSource;
-//    }
 
     @Bean
     public EntityManagerFactory entityManagerFactory() {
@@ -53,7 +42,6 @@ public class ApplicationConfig {
         factory.setJpaVendorAdapter(vendorAdapter);
         factory.setPackagesToScan("com.teamdev.chat.persistence.dom");
         factory.setDataSource(dataSource());
-//        factory.setJpaProperties(hibernateProperties());
         factory.afterPropertiesSet();
 
         return factory.getObject();
@@ -65,12 +53,5 @@ public class ApplicationConfig {
         JpaTransactionManager txManager = new JpaTransactionManager();
         txManager.setEntityManagerFactory(entityManagerFactory());
         return txManager;
-    }
-
-    private Properties hibernateProperties() {
-        Properties properties = new Properties();
-        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        properties.put("hibernate.hbm2ddl.auto", "create");
-        return  properties;
     }
 }

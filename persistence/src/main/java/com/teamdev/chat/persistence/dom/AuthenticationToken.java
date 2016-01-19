@@ -3,54 +3,46 @@ package com.teamdev.chat.persistence.dom;
 import com.teamdev.utils.Hasher;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "TOKEN")
+@Table
 public class AuthenticationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "tokenId")
     private long id;
     private Date expirationTime;
-    @OneToOne
-    @JoinColumn(name = "token")
+    @OneToOne(mappedBy = "token")
     private User user;
-    private String key;
+    private String tokenKey;
 
     AuthenticationToken() {
     }
 
-    public AuthenticationToken(User user) {
+    public AuthenticationToken(long userId) {
         this.expirationTime = new Date(System.currentTimeMillis() + 1000 * 60 * 15);
-        this.user = user;
-        this.key = Hasher.createHash(System.nanoTime() * Math.random() * 1000 + user.getId() + "");
-    }
-
-    public User getUser() {
-        return user;
+        this.tokenKey = Hasher.createHash(System.nanoTime() * Math.random() * 1000 + userId + "");
     }
 
     public void setUser(User user) {
         this.user = user;
     }
 
-    public long getId() {
-        return id;
+    public User getUser() {
+        return user;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public long getId() {
+        return id;
     }
 
     public Date getExpirationTime() {
         return expirationTime;
     }
 
-    public String getKey() {
-        return key;
+    public String getTokenKey() {
+        return tokenKey;
     }
 
     @Override
