@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>com.teamdev.chatservice</groupId>
-            <artifactId>request-wrappers</artifactId>
+            <artifactId>web-api</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

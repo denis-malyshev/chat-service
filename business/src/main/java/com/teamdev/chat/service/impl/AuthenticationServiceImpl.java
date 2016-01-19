@@ -13,8 +13,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 import static com.teamdev.utils.Hasher.createHash;
 
 @Service
@@ -39,8 +37,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AuthenticationException("Invalid login or password.");
         }
 
-        AuthenticationToken token = generateToken(user.getId());
+        AuthenticationToken token = generateToken(user);
         user.setToken(token);
+        userRepository.save(user);
         LOG.info(String.format("User %s logged successfully.", loginInfo.email));
         return new Token(token.getKey());
     }
@@ -57,12 +56,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void validate(Token token, UserId userId) throws AuthenticationException {
         LOG.info("Checking user token.");
         AuthenticationToken innerToken = tokenRepository.findByKey(token.key);
-
-        if (innerToken == null || innerToken.getUser().getId() != userId.id) {
+        System.out.println(innerToken.getUser().getId());
+        if (innerToken.getUser().getId() != userId.id) {
             LOG.error("Invalid token.");
             throw new AuthenticationException("Invalid token.");
         }
-        if (innerToken.getExpirationTime().compareTo(LocalDateTime.now()) < 1) {
+        if (innerToken.getExpirationTime().getTime() < System.currentTimeMillis()) {
             LOG.error("Token has been expired.");
             throw new AuthenticationException("Token has been expired.");
         }
@@ -70,8 +69,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         LOG.info("User's token is valid.");
     }
 
-    private AuthenticationToken generateToken(long userId) {
-        AuthenticationToken token = new AuthenticationToken(userId);
+    private AuthenticationToken generateToken(User user) {
+        AuthenticationToken token = new AuthenticationToken(user);
         tokenRepository.save(token);
         return token;
     }

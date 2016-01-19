@@ -28,7 +28,7 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "chatRoomId", unique = true)})
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
-    public User() {
+    User() {
     }
 
     public User(String firstName, String email, String password) {
@@ -49,10 +49,6 @@ public class User {
         return messages;
     }
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
-
     public long getId() {
         return id;
     }
@@ -65,16 +61,8 @@ public class User {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
@@ -89,8 +77,8 @@ public class User {
         return chatRooms;
     }
 
-    public void setChatRooms(Set<ChatRoom> chatRooms) {
-        this.chatRooms = chatRooms;
+    public void addChatRoom(ChatRoom chatRoom) {
+        chatRooms.add(chatRoom);
     }
 
     @Override

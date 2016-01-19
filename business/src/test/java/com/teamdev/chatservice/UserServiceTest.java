@@ -86,7 +86,7 @@ public class UserServiceTest {
     @Test
     public void testFindUserById() throws UserNotFoundException {
         userRepository.save(user1);
-        AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
+        AuthenticationToken authenticationToken = new AuthenticationToken(user1);
         tokenRepository.save(authenticationToken);
 
         UserDTO userDTO = userService.findById(new Token(authenticationToken.getKey()), new UserId(user1.getId()), new UserId(user1.getId()));

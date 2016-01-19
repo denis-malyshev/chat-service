@@ -45,7 +45,7 @@ public class ChatRoomServiceTest {
         userRepository.save(user);
         userId = new UserId(user.getId());
 
-        AuthenticationToken authToken = new AuthenticationToken(userId.id);
+        AuthenticationToken authToken = new AuthenticationToken(user);
         tokenRepository.save(authToken);
         token = new Token(authToken.getKey());
 

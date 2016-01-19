@@ -4,6 +4,7 @@ import com.teamdev.utils.Hasher;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "TOKEN")
@@ -13,20 +14,19 @@ public class AuthenticationToken {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "tokenId")
     private long id;
-    private LocalDateTime expirationTime;
-    private long userId;
+    private Date expirationTime;
     @OneToOne
     @JoinColumn(name = "token")
     private User user;
     private String key;
 
-    public AuthenticationToken() {
+    AuthenticationToken() {
     }
 
-    public AuthenticationToken(long userId) {
-        this.expirationTime = LocalDateTime.now().plusMinutes(15L);
-        this.userId = userId;
-        this.key = Hasher.createHash(System.nanoTime() * Math.random() * 100 + userId + "");
+    public AuthenticationToken(User user) {
+        this.expirationTime = new Date(System.currentTimeMillis() + 1000 * 60 * 15);
+        this.user = user;
+        this.key = Hasher.createHash(System.nanoTime() * Math.random() * 1000 + user.getId() + "");
     }
 
     public User getUser() {
@@ -45,24 +45,8 @@ public class AuthenticationToken {
         this.id = id;
     }
 
-    public LocalDateTime getExpirationTime() {
+    public Date getExpirationTime() {
         return expirationTime;
-    }
-
-    public void setExpirationTime(LocalDateTime expirationTime) {
-        this.expirationTime = expirationTime;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public String getKey() {

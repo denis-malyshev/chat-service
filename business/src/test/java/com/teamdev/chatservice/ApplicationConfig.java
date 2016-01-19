@@ -26,22 +26,22 @@ import java.util.Properties;
 public class ApplicationConfig {
 
 
-//    @Bean
-//    public DataSource dataSource() {
-//
-//        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-//        return builder.setType(EmbeddedDatabaseType.HSQL).build();
-//    }
-
     @Bean
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/mydb");
-        dataSource.setUsername("root");
-        dataSource.setPassword("140142");
-        return dataSource;
+
+        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+        return builder.setType(EmbeddedDatabaseType.HSQL).build();
     }
+
+//    @Bean
+//    public DataSource dataSource() {
+//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+//        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+//        dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/mydb");
+//        dataSource.setUsername("root");
+//        dataSource.setPassword("");
+//        return dataSource;
+//    }
 
     @Bean
     public EntityManagerFactory entityManagerFactory() {
@@ -53,7 +53,7 @@ public class ApplicationConfig {
         factory.setJpaVendorAdapter(vendorAdapter);
         factory.setPackagesToScan("com.teamdev.chat.persistence.dom");
         factory.setDataSource(dataSource());
-        factory.setJpaProperties(hibernateProperties());
+//        factory.setJpaProperties(hibernateProperties());
         factory.afterPropertiesSet();
 
         return factory.getObject();

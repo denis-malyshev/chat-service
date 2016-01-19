@@ -20,7 +20,7 @@
         <module>integration-tests</module>
         <module>webapp</module>
         <module>utils</module>
-        <module>request-wrappers</module>
+        <module>web-api</module>
     </modules>
 
 </project>

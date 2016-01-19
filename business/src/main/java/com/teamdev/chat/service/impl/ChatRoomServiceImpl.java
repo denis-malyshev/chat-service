@@ -60,8 +60,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = getChatRoom(chatRoomId);
         User user = getUser(userId);
 
-        user.getChatRooms().add(chatRoom);
-        chatRoom.getUsers().add(user);
+        user.addChatRoom(chatRoom);
+        chatRoom.addUser(user);
 
         userRepository.save(user);
         chatRoomRepository.save(chatRoom);
