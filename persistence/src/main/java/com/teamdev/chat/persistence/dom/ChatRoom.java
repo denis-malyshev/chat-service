@@ -10,7 +10,6 @@ public class ChatRoom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "chatRoomId")
     private long id;
     private String name;
     @OneToMany(fetch = FetchType.EAGER)

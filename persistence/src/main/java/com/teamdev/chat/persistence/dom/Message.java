@@ -9,7 +9,6 @@ public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "messageId")
     private long id;
     private LocalDateTime time;
     private String text;
