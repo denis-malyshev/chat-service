@@ -12,10 +12,10 @@ public class Message {
     private long id;
     private LocalDateTime time;
     private String text;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User sender;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User receiver;
     @ManyToOne(fetch = FetchType.EAGER)

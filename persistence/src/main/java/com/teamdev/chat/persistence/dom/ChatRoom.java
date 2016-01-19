@@ -14,7 +14,7 @@ public class ChatRoom {
     private String name;
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Message> messages = new HashSet<>();
-    @ManyToMany(mappedBy = "chatRooms", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "chatRooms")
     private Set<User> users = new HashSet<>();
 
     ChatRoom() {
@@ -38,10 +38,6 @@ public class ChatRoom {
 
     public Set<User> getUsers() {
         return users;
-    }
-
-    public void addUser(User user) {
-        users.add(user);
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 import static com.teamdev.utils.Hasher.createHash;
 import static java.lang.String.format;
 
+@Transactional
 @Service
 public class UserServiceImpl implements UserService {
 

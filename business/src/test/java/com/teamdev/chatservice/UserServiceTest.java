@@ -1,8 +1,10 @@
 package com.teamdev.chatservice;
 
 import com.teamdev.chat.persistence.AuthenticationTokenRepository;
+import com.teamdev.chat.persistence.ChatRoomRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.AuthenticationToken;
+import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.dto.Token;
@@ -11,27 +13,32 @@ import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static org.junit.Assert.*;
 
 public class UserServiceTest {
 
+    private static final Logger log = Logger.getLogger(UserServiceTest.class);
+
     private UserService userService;
     private UserRepository userRepository;
-
     private AuthenticationTokenRepository tokenRepository;
-
+    private ChatRoomRepository chatRoomRepository;
     private User user1;
     private UserDTO userDTO = new UserDTO("Vasya", "vasya.user.service@gmail.com", "pwd");
 
     @Before
     public void setUp() throws Exception {
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-
+        chatRoomRepository = context.getBean(ChatRoomRepository.class);
         userService = context.getBean(UserService.class);
         userRepository = context.getBean(UserRepository.class);
         user1 = new User("Vasya", "vasya.user.service@gmail.com", "pwd1");
@@ -44,7 +51,7 @@ public class UserServiceTest {
         try {
             UserDTO register = userService.register(new UserDTO("Vasya", "vasya.use1r.service@gmail.com", "pwd"));
 
-            assertNotNull("User must be exist.",register);
+            assertNotNull("User must be exist.", register);
         } catch (AuthenticationException | RegistrationException e) {
             fail("Unexpected exception.");
         }
@@ -93,5 +100,11 @@ public class UserServiceTest {
 
         UserDTO userDTO = userService.findById(new Token(authenticationToken.getTokenKey()), new UserId(user1.getId()), new UserId(user1.getId()));
         assertNotNull("UserDTO must exist.", userDTO);
+    }
+
+    @Test
+    public void testQuery() throws Exception {
+        Collection<ChatRoom> list = chatRoomRepository.findChatRoomsByUserId(14);
+        log.info("result: " + list);
     }
 }

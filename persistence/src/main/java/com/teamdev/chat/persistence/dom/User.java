@@ -22,10 +22,7 @@ public class User {
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
     private List<Message> messages = new ArrayList<>();
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_chat_room",
-            joinColumns = {@JoinColumn(name = "userId", unique = true)},
-            inverseJoinColumns = {@JoinColumn(name = "chatRoomId")})
+    @ManyToMany
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
     User() {
@@ -67,10 +64,6 @@ public class User {
 
     public Set<ChatRoom> getChatRooms() {
         return chatRooms;
-    }
-
-    public void addChatRoom(ChatRoom chatRoom) {
-        chatRooms.add(chatRoom);
     }
 
     @Override

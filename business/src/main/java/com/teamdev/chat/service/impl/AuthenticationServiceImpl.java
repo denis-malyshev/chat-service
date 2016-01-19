@@ -12,9 +12,11 @@ import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.teamdev.utils.Hasher.createHash;
 
+@Transactional
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 

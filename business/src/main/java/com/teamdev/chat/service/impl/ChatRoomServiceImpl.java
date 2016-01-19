@@ -16,12 +16,14 @@ import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
 import static java.lang.String.format;
 
 @Service
+@Transactional
 public class ChatRoomServiceImpl implements ChatRoomService {
 
     private static final Logger LOG = Logger.getLogger(ChatRoomServiceImpl.class);
@@ -56,8 +58,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = getChatRoom(chatRoomId);
         User user = getUser(userId);
 
-        user.addChatRoom(chatRoom);
-        chatRoom.addUser(user);
+        user.getChatRooms().add(chatRoom);
+        chatRoom.getUsers().add(user);
 
         userRepository.save(user);
         chatRoomRepository.save(chatRoom);
