@@ -1,78 +1,54 @@
 package com.teamdev.chatservice;
 
-import com.teamdev.chat.persistence.AuthenticationTokenRepository;
-import com.teamdev.chat.persistence.ChatRoomRepository;
-import com.teamdev.chat.persistence.MessageRepository;
-import com.teamdev.chat.persistence.UserRepository;
-import com.teamdev.chat.persistence.dom.AuthenticationToken;
-import com.teamdev.chat.persistence.dom.ChatRoom;
-import com.teamdev.chat.persistence.dom.Message;
-import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.AuthenticationService;
+import com.teamdev.chat.service.ChatRoomService;
 import com.teamdev.chat.service.MessageService;
-import com.teamdev.chat.service.impl.dto.ChatRoomId;
-import com.teamdev.chat.service.impl.dto.MessageDTO;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserId;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import com.teamdev.chat.service.UserService;
+import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.exception.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class MessageServiceTest {
+public class MessageServiceTest extends AbstractSpringContext {
 
+    private static final Random RANDOM = new Random();
+
+    @Autowired
     private MessageService messageService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ChatRoomService chatRoomService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
-    private UserId senderId;
-    private UserId recipientId;
-
-    private ChatRoomId chatRoomId;
-    private MessageRepository messageRepository;
-
-    private Token token;
-    private User user1;
-    private User user2;
+    private static UserId testUserId;
+    private static ChatRoomId testChatRoomId;
+    private static Token testToken;
 
     @Before
-    public void setUp() {
-        ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-
-        messageService = context.getBean(MessageService.class);
-        UserRepository userRepository = context.getBean(UserRepository.class);
-        ChatRoomRepository chatRoomRepository = context.getBean(ChatRoomRepository.class);
-        messageRepository = context.getBean(MessageRepository.class);
-
-        ChatRoom chatRoom = new ChatRoom("test-chat");
-        chatRoomRepository.save(chatRoom);
-        chatRoomId = new ChatRoomId(chatRoom.getId());
-
-        user1 = new User("Vasya", "vasya.message.service@gmail.com", "pwd1");
-        user2 = new User("Masha", "masha.message.service@gmail.com", "pwd");
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-
-        senderId = new UserId(user1.getId());
-        recipientId = new UserId(user2.getId());
-
-        AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
-        AuthenticationTokenRepository tokenRepository = context.getBean(AuthenticationTokenRepository.class);
-        tokenRepository.save(authenticationToken);
-        token = new Token(authenticationToken.getTokenKey());
+    public void setUp() throws RegistrationException, ChatRoomAlreadyExistsException {
+        final int identifier = RANDOM.nextInt();
+        String testEmail = String.format("test.user%d@gmail.com", identifier);
+        UserDTO testUser = userService.register(new UserDTO("Vasya", testEmail, "pwd"));
+        testUserId = new UserId(testUser.id);
+        testToken = authenticationService.login(new LoginInfo(testEmail, "pwd"));
+        String testChatRoomName = "chat-room-" + identifier;
+        ChatRoomDTO chatRoomDTO = chatRoomService.create(testToken, testUserId, testChatRoomName);
+        testChatRoomId = new ChatRoomId(chatRoomDTO.id);
     }
 
     @Test
-    public void testSendMessage_MessageRepositoryCanNotBeEmpty() {
+    public void testSendMessage() {
         try {
-            MessageDTO messageDTO = messageService.sendMessage(token, senderId, chatRoomId, "Hello, Masha!");
+            MessageDTO messageDTO = messageService.sendMessage(testToken, testUserId, testChatRoomId, "Hello, Masha!");
             assertNotNull(messageDTO);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
             fail("Unexpected exception.");
@@ -80,9 +56,10 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void testSendPrivateMessage() {
+    public void testSendPrivateMessage() throws RegistrationException {
+        UserDTO register = userService.register(new UserDTO("Vasya", "recipien@gmail.com", "pwd"));
         try {
-            MessageDTO messageDTO = messageService.sendPrivateMessage(token, senderId, recipientId, "Hello");
+            MessageDTO messageDTO = messageService.sendPrivateMessage(testToken, testUserId, new UserId(register.id), "Hello");
             assertNotNull(messageDTO);
         } catch (AuthenticationException | UserNotFoundException e) {
             fail("Unexpected exception.");
@@ -93,7 +70,7 @@ public class MessageServiceTest {
     public void testSendMessageToNotExistingChat() {
 
         try {
-            messageService.sendMessage(token, senderId, new ChatRoomId(999L), "Hello, Masha!");
+            messageService.sendMessage(testToken, testUserId, new ChatRoomId(999L), "Hello, Masha!");
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
             String result = e.getMessage();
             assertEquals("Exception message must be correct.", "ChatRoom with this id [999] not exists.", result);
@@ -104,7 +81,7 @@ public class MessageServiceTest {
     public void testSendMessageToNotExistingUser() {
 
         try {
-            messageService.sendPrivateMessage(token, senderId, new UserId(999L), "Hello, Masha!");
+            messageService.sendPrivateMessage(testToken, testUserId, new UserId(999L), "Hello, Masha!");
         } catch (AuthenticationException | UserNotFoundException e) {
             String result = e.getMessage();
             assertEquals("Exception message must be correct.", "User with this id [999] not exists.", result);
@@ -113,8 +90,7 @@ public class MessageServiceTest {
 
     @Test
     public void testFindAllAfterDate() throws Exception {
-        messageRepository.save(new Message("Hello", user1, user2));
-        ArrayList<MessageDTO> result = messageService.findAllAfterDate(token, senderId, new Date());
+        ArrayList<MessageDTO> result = messageService.findAllAfterDate(testToken, testUserId, new Date());
         assertNotNull("Result can't be null.", result);
     }
 }

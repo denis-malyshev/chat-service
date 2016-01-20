@@ -1,48 +1,22 @@
 package com.teamdev.chatservice;
 
-import com.teamdev.chat.persistence.AuthenticationTokenRepository;
-import com.teamdev.chat.persistence.ChatRoomRepository;
-import com.teamdev.chat.persistence.UserRepository;
-import com.teamdev.chat.persistence.dom.AuthenticationToken;
-import com.teamdev.chat.persistence.dom.ChatRoom;
-import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.dto.Token;
 import com.teamdev.chat.service.impl.dto.UserDTO;
-import com.teamdev.chat.service.impl.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.Collection;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
-public class UserServiceTest {
+public class UserServiceTest extends AbstractSpringContext {
 
-    private static final Logger log = Logger.getLogger(UserServiceTest.class);
+    private static final Logger LOG = Logger.getLogger(UserServiceTest.class);
 
+    @Autowired
     private UserService userService;
-    private UserRepository userRepository;
-    private AuthenticationTokenRepository tokenRepository;
-    private User user1;
     private UserDTO testUserDTO = new UserDTO("Vasya", "vasya.user.service@gmail.com", "pwd");
-
-    @Before
-    public void setUp() throws Exception {
-        ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-        ChatRoomRepository chatRoomRepository = context.getBean(ChatRoomRepository.class);
-        userService = context.getBean(UserService.class);
-        userRepository = context.getBean(UserRepository.class);
-        user1 = new User("Vasya", "vasya.user.service@gmail.com", "pwd1");
-
-        tokenRepository = context.getBean(AuthenticationTokenRepository.class);
-    }
 
     @Test
     public void testRegistrationUser() {
@@ -57,9 +31,8 @@ public class UserServiceTest {
 
     @Test
     public void testRegistrationUserWithExistingEmail() {
-        userRepository.save(user1);
-
         try {
+            userService.register(testUserDTO);
             userService.register(testUserDTO);
 
             fail();
@@ -86,15 +59,4 @@ public class UserServiceTest {
         }
     }
 
-    @Test
-    public void testFindUserById() throws UserNotFoundException {
-        userRepository.save(user1);
-        AuthenticationToken authenticationToken = new AuthenticationToken(user1.getId());
-        tokenRepository.save(authenticationToken);
-        user1.setToken(authenticationToken);
-        userRepository.save(user1);
-
-        UserDTO userDTO = userService.findById(new Token(authenticationToken.getTokenKey()), new UserId(user1.getId()), new UserId(user1.getId()));
-        assertNotNull("UserDTO must exist.", userDTO);
-    }
 }
