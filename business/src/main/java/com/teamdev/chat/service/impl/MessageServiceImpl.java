@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,14 +50,14 @@ public class MessageServiceImpl implements MessageService {
 
         Message message = messageRepository.save(new Message(text, user, chatRoom));
 
-        user.getMessages().add(message);
+        user.getSentMessages().add(message);
         chatRoom.getMessages().add(message);
 
         userRepository.save(user);
         chatRoomRepository.save(chatRoom);
 
         LOG.info("Message sent successfully.");
-        return new MessageDTO(message.getId(), message.getText(), message.getTime());
+        return new MessageDTO(message.getId(), message.getText(), message.getCreatingTime());
     }
 
     @Override
@@ -71,24 +71,24 @@ public class MessageServiceImpl implements MessageService {
 
         Message message = messageRepository.save(new Message(text, sender, receiver));
 
-        sender.getMessages().add(message);
-        receiver.getMessages().add(message);
+        sender.getSentMessages().add(message);
+        receiver.getReceivedMessages().add(message);
 
         userRepository.save(sender);
         userRepository.save(receiver);
 
         LOG.info("Message sent successfully.");
-        return new MessageDTO(message.getId(), message.getText(), message.getTime());
+        return new MessageDTO(message.getId(), message.getText(), message.getCreatingTime());
     }
 
     @Override
-    public ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, LocalDateTime dateTime) {
-        List<Message> messages = messageRepository.findByTimeAfter(dateTime);
+    public ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, Date date) {
+        List<Message> messages = messageRepository.findByCreatingTimeAfter(date);
         return messages.stream().map(message ->
                 new MessageDTO(
                         message.getId(),
                         message.getText(),
-                        message.getTime())).
+                        message.getCreatingTime())).
                 collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
     }
 

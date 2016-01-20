@@ -4,16 +4,15 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Hasher {
 
-    private static final HashFunction hashFunction = Hashing.md5();
+    private static final HashFunction HASH_FUNCTION = Hashing.md5();
     private static final Random RANDOM = new Random();
 
     public static String createHash(String toHash) {
-        return hashFunction.newHasher().
+        return HASH_FUNCTION.newHasher().
                 putString(toHash, Charset.defaultCharset()).
                 hash().toString();
     }

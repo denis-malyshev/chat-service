@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
@@ -31,14 +30,13 @@ public class UserServiceTest {
     private UserService userService;
     private UserRepository userRepository;
     private AuthenticationTokenRepository tokenRepository;
-    private ChatRoomRepository chatRoomRepository;
     private User user1;
-    private UserDTO userDTO = new UserDTO("Vasya", "vasya.user.service@gmail.com", "pwd");
+    private UserDTO testUserDTO = new UserDTO("Vasya", "vasya.user.service@gmail.com", "pwd");
 
     @Before
     public void setUp() throws Exception {
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-        chatRoomRepository = context.getBean(ChatRoomRepository.class);
+        ChatRoomRepository chatRoomRepository = context.getBean(ChatRoomRepository.class);
         userService = context.getBean(UserService.class);
         userRepository = context.getBean(UserRepository.class);
         user1 = new User("Vasya", "vasya.user.service@gmail.com", "pwd1");
@@ -62,7 +60,7 @@ public class UserServiceTest {
         userRepository.save(user1);
 
         try {
-            userService.register(userDTO);
+            userService.register(testUserDTO);
 
             fail();
         } catch (AuthenticationException e) {
@@ -76,9 +74,7 @@ public class UserServiceTest {
     @Test
     public void testRegistrationUserWithIncorrectEmail() {
         try {
-
             UserDTO invalidUserDTO = new UserDTO("Vasya", "vasya-gmail.com", "pwd");
-
             userService.register(invalidUserDTO);
 
             fail();
@@ -100,11 +96,5 @@ public class UserServiceTest {
 
         UserDTO userDTO = userService.findById(new Token(authenticationToken.getTokenKey()), new UserId(user1.getId()), new UserId(user1.getId()));
         assertNotNull("UserDTO must exist.", userDTO);
-    }
-
-    @Test
-    public void testQuery() throws Exception {
-        Collection<ChatRoom> list = chatRoomRepository.findChatRoomsByUserId(14);
-        log.info("result: " + list);
     }
 }

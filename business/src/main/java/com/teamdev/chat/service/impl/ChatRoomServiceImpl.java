@@ -59,10 +59,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User user = getUser(userId);
 
         user.getChatRooms().add(chatRoom);
-        chatRoom.getUsers().add(user);
-
         userRepository.save(user);
-        chatRoomRepository.save(chatRoom);
 
         LOG.info(format("Joined user with id[%d] into chat-room with id[%d] was successfully.", userId.id, chatRoomId.id));
     }

@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.getTokenFromResponse;
 import static com.teamdev.integration.tests.UserServiceTest.getUserFromResponse;
@@ -42,21 +43,23 @@ public class ChatRoomServiceTest {
     private static Token testToken;
     private static ChatRoomDTO testChatDTO;
     private static ChatRoomId testChatRoomId;
-
     private static CloseableHttpClient httpClient;
 
     @BeforeClass
     public static void beforeClass() {
+        Random random = new Random();
+        String testUserEmail = format("userservice%d@gmail.com", random.nextInt(1000));
+        String testChatRoomName = format("testChatForChatService%d", random.nextInt(1000));
+        UserDTO userDTO = new UserDTO(
+                "Vasya",
+                testUserEmail,
+                "pwd");
         try {
-            UserDTO userDTO = new UserDTO(
-                    "Vasya",
-                    "chatservice@gmail.com",
-                    "pwd");
             testUserDTO = getUserFromResponse(register(userDTO));
             testToken = getTokenFromResponse(AuthenticationServiceTest.login(
                     new LoginInfo(userDTO.email, userDTO.password)));
             testChatDTO = getChatFromResponse(create(
-                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), "testChatForChatService")));
+                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), testChatRoomName)));
             testUserId = new UserId(testUserDTO.id);
             testChatRoomId = new ChatRoomId(testChatDTO.id);
             joinUserToChat(testToken, testUserId, testChatRoomId);
@@ -72,8 +75,10 @@ public class ChatRoomServiceTest {
 
     @Test
     public void testCreateChat() {
+        Random random = new Random();
+        String testChatName = "chat-" + random.nextInt(1000);
         try {
-            ChatRoomRequest chatRoomRequest = new ChatRoomRequest(testToken, testUserId, "chat-2");
+            ChatRoomRequest chatRoomRequest = new ChatRoomRequest(testToken, testUserId, testChatName);
             ChatRoomDTO chatRoomDTO = getChatFromResponse(create(chatRoomRequest));
             assertEquals(chatRoomRequest.name, chatRoomDTO.name);
         } catch (IOException e) {

@@ -10,7 +10,7 @@
     </properties>
 
     <groupId>com.teamdev.chatservice</groupId>
-    <artifactId>chatroom-service</artifactId>
+    <artifactId>chat-service</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
 

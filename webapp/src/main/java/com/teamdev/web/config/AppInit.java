@@ -15,7 +15,6 @@ public class AppInit implements WebApplicationInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(ApplicationConfig.class);
-        rootContext.refresh();
 
         servletContext.addListener(new ContextLoaderListener(rootContext));
 

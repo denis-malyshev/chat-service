@@ -69,7 +69,7 @@ public class MessageServiceController {
             return new ResponseEntity<>(messageService.findAllAfterDate(
                     readMessagesRequest.token,
                     readMessagesRequest.userId,
-                    readMessagesRequest.dateTime), HttpStatus.OK);
+                    readMessagesRequest.date), HttpStatus.OK);
         } catch (AuthenticationException e) {
             LOG.error(e.getMessage(), e);
             throw e;

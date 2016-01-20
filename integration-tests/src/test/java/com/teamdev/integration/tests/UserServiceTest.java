@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.getTokenFromResponse;
 import static com.teamdev.integration.tests.ChatRoomServiceTest.*;
@@ -34,21 +35,23 @@ public class UserServiceTest {
     private static final String FIND_CHATS_URL = USER_SERVICE_URL + "/chats";
     private static UserDTO testUserDTO;
     private static Token testToken;
-
     private static CloseableHttpClient httpClient;
 
     @BeforeClass
     public static void beforeClass() {
+        Random random = new Random();
+        String testUserEmail = format("userservice%d@gmail.com", random.nextInt(1000));
+        String testChatRoomName = format("testChatForUserService%d", random.nextInt(1000));
         try {
             UserDTO userDTO = new UserDTO(
                     "VasyaFromUserService",
-                    "userservice@gmail.com",
+                    testUserEmail,
                     "userservice");
             testUserDTO = getUserFromResponse(register(userDTO));
             testToken = getTokenFromResponse(AuthenticationServiceTest.login(
                     new LoginInfo(userDTO.email, userDTO.password)));
             ChatRoomDTO testChatDTO = getChatFromResponse(create(
-                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), "testChatForUserService")));
+                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), testChatRoomName)));
             joinUserToChat(testToken, new UserId(testUserDTO.id), new ChatRoomId(testChatDTO.id));
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
@@ -62,8 +65,11 @@ public class UserServiceTest {
 
     @Test
     public void testRegisterUser() {
+        Random random = new Random();
+        String testEmail = format("vasya%d@gmail.com", random.nextInt(1000));
+        String testPassword = format("pwd%d", random.nextInt(1000));
+        UserDTO registerDTO = new UserDTO("Vasya", testEmail, testPassword);
         try {
-            UserDTO registerDTO = new UserDTO("Vasya", "vasya23@gmail.com", "pwd");
             CloseableHttpResponse response = register(registerDTO);
             UserDTO userDTO = getUserFromResponse(response);
             assertEquals("Emails must be equals.", registerDTO.email, userDTO.email);
@@ -103,8 +109,10 @@ public class UserServiceTest {
 
     @Test
     public void testFindById() {
+        Random random = new Random();
+        String testEmail = format("masha%d@gmail.com", random.nextInt(1000));
         try {
-            UserDTO registerDTO = new UserDTO("Masha", "masha@gmail.com", "pwd");
+            UserDTO registerDTO = new UserDTO("Masha", testEmail, "pwd");
             CloseableHttpResponse httpResponse = register(registerDTO);
             UserDTO registeredDTO = fromJson(contentToString(httpResponse), UserDTO.class);
 

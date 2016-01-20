@@ -16,8 +16,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.getTokenFromResponse;
 import static com.teamdev.integration.tests.ChatRoomServiceTest.*;
@@ -26,6 +27,7 @@ import static com.teamdev.integration.tests.UserServiceTest.register;
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
+import static java.lang.String.format;
 import static org.junit.Assert.*;
 
 public class MessageServiceTest {
@@ -35,25 +37,28 @@ public class MessageServiceTest {
     private static final String SEND_URL = MESSAGE_SERVICE_URL + "/send";
     private static final String SEND_PRIVATE_URL = MESSAGE_SERVICE_URL + "/send_private";
     private static final String FIND_ALL_AFTER = MESSAGE_SERVICE_URL + "/find_all_after";
+    public static final int FIVE_MINUTES = 1000 * 60 * 5;
 
     private static UserId testUserId;
     private static Token testToken;
     private static ChatRoomId testChatRoomId;
-
     private static CloseableHttpClient httpClient;
 
     @BeforeClass
     public static void beforeClass() {
+        Random random = new Random();
+        String testUserEmail = format("messageservice%d@gmail.com", random.nextInt(1000));
+        String testChatRoomName = format("testChatForMessageService%d", random.nextInt(1000));
+        UserDTO userDTO = new UserDTO(
+                "VasyaFromMessageService",
+                testUserEmail,
+                "messaheservice");
         try {
-            UserDTO userDTO = new UserDTO(
-                    "VasyaFromMessageService",
-                    "messageservice@gmail.com",
-                    "messaheservice");
             UserDTO testUserDTO = getUserFromResponse(register(userDTO));
             testToken = getTokenFromResponse(AuthenticationServiceTest.login(
                     new LoginInfo(userDTO.email, userDTO.password)));
             ChatRoomDTO testChatDTO = getChatFromResponse(create(
-                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), "testChatForMessageService")));
+                    new ChatRoomRequest(testToken, new UserId(testUserDTO.id), testChatRoomName)));
             testUserId = new UserId(testUserDTO.id);
             testChatRoomId = new ChatRoomId(testChatDTO.id);
             joinUserToChat(testToken, testUserId, testChatRoomId);
@@ -104,8 +109,10 @@ public class MessageServiceTest {
 
     @Test
     public void testSendPrivateMessage() {
+        Random random = new Random();
+        String testEmail = format("serega%d@gmail.com", random.nextInt(1000));
         try {
-            UserDTO userDTO = new UserDTO("Serega", "serega@gmail.com", "pwd");
+            UserDTO userDTO = new UserDTO("Serega", testEmail, "pwd");
             CloseableHttpResponse httpResponse = register(userDTO);
             UserDTO registeredUser = fromJson(contentToString(httpResponse), UserDTO.class);
 
@@ -145,7 +152,7 @@ public class MessageServiceTest {
     public void testFindAllMessagesAfterDate() {
         try {
             HttpPost httpPost = new HttpPost(FIND_ALL_AFTER);
-            ReadMessagesRequest readMessagesRequest = new ReadMessagesRequest(testToken, testUserId, LocalDateTime.now().minusDays(1L));
+            ReadMessagesRequest readMessagesRequest = new ReadMessagesRequest(testToken, testUserId, new Date(System.currentTimeMillis() - FIVE_MINUTES));
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(new StringEntity(toJson(readMessagesRequest)));
 

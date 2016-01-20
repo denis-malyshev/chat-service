@@ -8,8 +8,8 @@ import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 
 public interface MessageService {
 
@@ -19,5 +19,5 @@ public interface MessageService {
     MessageDTO sendPrivateMessage(Token token, UserId senderId, UserId receiverId, String text)
             throws AuthenticationException, UserNotFoundException;
 
-    ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, LocalDateTime dateTime);
+    ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, Date date);
 }

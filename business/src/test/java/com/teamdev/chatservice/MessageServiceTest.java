@@ -23,6 +23,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static org.junit.Assert.*;
 
@@ -79,7 +80,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void testSendPrivateMessage_MessageRepositoryCanNotBeEmpty() {
+    public void testSendPrivateMessage() {
         try {
             MessageDTO messageDTO = messageService.sendPrivateMessage(token, senderId, recipientId, "Hello");
             assertNotNull(messageDTO);
@@ -113,7 +114,7 @@ public class MessageServiceTest {
     @Test
     public void testFindAllAfterDate() throws Exception {
         messageRepository.save(new Message("Hello", user1, user2));
-        ArrayList<MessageDTO> result = messageService.findAllAfterDate(token, senderId, LocalDateTime.now().minusHours(1L));
+        ArrayList<MessageDTO> result = messageService.findAllAfterDate(token, senderId, new Date());
         assertNotNull("Result can't be null.", result);
     }
 }

@@ -14,12 +14,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Random;
 
 import static com.teamdev.integration.tests.UserServiceTest.getUserFromResponse;
 import static com.teamdev.integration.tests.UserServiceTest.register;
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
+import static java.lang.String.format;
 import static org.junit.Assert.*;
 
 public class AuthenticationServiceTest {
@@ -35,11 +37,13 @@ public class AuthenticationServiceTest {
 
     @BeforeClass
     public static void beforeClass() {
+        Random random = new Random();
+        String testUserEmail = format("authservice%d@gmail.com", random.nextInt(1000));
+        UserDTO userDTO = new UserDTO(
+                "VasyaFromAuthService",
+                testUserEmail,
+                "authservice");
         try {
-            UserDTO userDTO = new UserDTO(
-                    "VasyaFromAuthService",
-                    "authservice@gmail.com",
-                    "authservice");
             validLoginInfo = new LoginInfo(userDTO.email, userDTO.password);
             getUserFromResponse(register(userDTO));
         } catch (IOException e) {

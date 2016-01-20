@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import java.util.Collection;
 
 @Repository
 public interface ChatRoomRepository extends CrudRepository<ChatRoom, Long> {
@@ -15,5 +15,5 @@ public interface ChatRoomRepository extends CrudRepository<ChatRoom, Long> {
 
     @Query(value = "select * from chatroom c inner join user_chatroom ch on ch.chatRooms_id = c.id and ch.users_id = :id",
             nativeQuery = true)
-    Set<ChatRoom> findChatRoomsByUserId(@Param("id") long userId);
+    Collection<ChatRoom> findChatRoomsByUserId(@Param("id") long userId);
 }
