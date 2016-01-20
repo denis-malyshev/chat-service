@@ -1,7 +1,7 @@
 package com.teamdev.chat.persistence.dom;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table
@@ -10,40 +10,38 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private LocalDateTime time;
+    private Date creatingTime;
     private String text;
     @ManyToOne
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User sender;
     @ManyToOne
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User receiver;
-    @ManyToOne(fetch = FetchType.EAGER)
-    private ChatRoom chat;
+    @ManyToOne
+    private ChatRoom chatRoom;
 
     Message() {
     }
 
     public Message(String text, User sender, User receiver) {
-        this.time = LocalDateTime.now();
+        this.creatingTime = new Date();
         this.text = text;
         this.sender = sender;
         this.receiver = receiver;
     }
 
-    public Message(String text, User sender, ChatRoom chat) {
-        this.time = LocalDateTime.now();
+    public Message(String text, User sender, ChatRoom chatRoom) {
+        this.creatingTime = new Date();
         this.text = text;
         this.sender = sender;
-        this.chat = chat;
+        this.chatRoom = chatRoom;
     }
 
     public long getId() {
         return id;
     }
 
-    public LocalDateTime getTime() {
-        return time;
+    public Date getCreatingTime() {
+        return creatingTime;
     }
 
     public String getText() {
@@ -58,8 +56,8 @@ public class Message {
         return receiver;
     }
 
-    public ChatRoom getChat() {
-        return chat;
+    public ChatRoom getChatRoom() {
+        return chatRoom;
     }
 
     @Override
@@ -81,7 +79,7 @@ public class Message {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Message{");
-        sb.append("time=").append(time);
+        sb.append("creatingTime=").append(creatingTime);
         sb.append(", text='").append(text).append('\'');
         sb.append('}');
         return sb.toString();

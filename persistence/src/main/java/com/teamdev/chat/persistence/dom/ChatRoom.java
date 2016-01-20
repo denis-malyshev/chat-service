@@ -12,7 +12,7 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "chatRoom")
     private Set<Message> messages = new HashSet<>();
     @ManyToMany(mappedBy = "chatRooms")
     private Set<User> users = new HashSet<>();

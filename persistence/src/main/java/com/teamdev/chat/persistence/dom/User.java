@@ -19,9 +19,10 @@ public class User {
     @OneToOne
     @PrimaryKeyJoinColumn
     private AuthenticationToken token;
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "userId")
-    private List<Message> messages = new ArrayList<>();
+    @OneToMany(mappedBy = "sender")
+    private List<Message> sentMessages = new ArrayList<>();
+    @OneToMany(mappedBy = "receiver")
+    private List<Message> receivedMessages = new ArrayList<>();
     @ManyToMany
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
@@ -42,8 +43,12 @@ public class User {
         this.token = token;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    public List<Message> getSentMessages() {
+        return sentMessages;
+    }
+
+    public List<Message> getReceivedMessages() {
+        return receivedMessages;
     }
 
     public long getId() {

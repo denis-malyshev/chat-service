@@ -1,9 +1,10 @@
 package com.teamdev.chat.persistence.dom;
 
-import com.teamdev.utils.Hasher;
-
 import javax.persistence.*;
 import java.util.Date;
+
+import static com.teamdev.utils.Hasher.createHash;
+import static com.teamdev.utils.Hasher.modification;
 
 @Entity
 @Table
@@ -22,7 +23,7 @@ public class AuthenticationToken {
 
     public AuthenticationToken(long userId) {
         this.expirationTime = new Date(System.currentTimeMillis() + 1000 * 60 * 15);
-        this.tokenKey = Hasher.createHash(System.nanoTime() * Math.random() * 1000 + userId + "");
+        this.tokenKey = modification(createHash(System.nanoTime() * Math.random() * 10e9 + userId + ""));
     }
 
     public void setUser(User user) {
