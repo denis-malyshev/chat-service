@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,7 +74,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ArrayList<ChatRoomDTO> findAvailableChats(Token token, UserId userId) {
-        Set<ChatRoom> chatRooms = userRepository.findOne(userId.id).getChatRooms();
+        Collection<ChatRoom> chatRooms = userRepository.findOne(userId.id).getChatRooms();
         return chatRooms.stream().
                 map(chatRoom -> new ChatRoomDTO(
                         chatRoom.getId(),
