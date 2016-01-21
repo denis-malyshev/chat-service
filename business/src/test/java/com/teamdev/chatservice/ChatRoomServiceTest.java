@@ -1,74 +1,60 @@
 package com.teamdev.chatservice;
 
-import com.teamdev.chat.persistence.AuthenticationTokenRepository;
-import com.teamdev.chat.persistence.ChatRoomRepository;
-import com.teamdev.chat.persistence.UserRepository;
-import com.teamdev.chat.persistence.dom.AuthenticationToken;
-import com.teamdev.chat.persistence.dom.ChatRoom;
-import com.teamdev.chat.persistence.dom.User;
+import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.dto.ChatRoomId;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserId;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
-import org.junit.Assert;
+import com.teamdev.chat.service.UserService;
+import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chat.service.impl.exception.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class ChatRoomServiceTest {
+public class ChatRoomServiceTest extends SpringContextRunner {
 
+    private static final Random RANDOM = new Random();
+
+    @Autowired
     private ChatRoomService chatRoomService;
-    private ChatRoomRepository chatRoomRepository;
-    private User user;
-    private UserId userId;
-    private Token token;
-    private ChatRoomId chatRoomId;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private AuthenticationService authenticationService;
+    private UserId testUserId;
+    private Token testToken;
+    private ChatRoomId testChatRoomId;
 
     @Before
-    public void setUp() {
-
-        ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-
-        chatRoomService = context.getBean(ChatRoomService.class);
-        chatRoomRepository = context.getBean(ChatRoomRepository.class);
-        UserRepository userRepository = context.getBean(UserRepository.class);
-        AuthenticationTokenRepository tokenRepository = context.getBean(AuthenticationTokenRepository.class);
-
-        user = new User("Vasya", "vasya.chat.service@gmail.com", "pwd");
-        userRepository.save(user);
-        userId = new UserId(user.getId());
-
-        AuthenticationToken authToken = new AuthenticationToken(user.getId());
-        tokenRepository.save(authToken);
-        token = new Token(authToken.getTokenKey());
-
-        ChatRoom chatRoom = new ChatRoom("chat-1");
-        chatRoomRepository.save(chatRoom);
-        chatRoomId = new ChatRoomId(chatRoom.getId());
+    public void setUp() throws RegistrationException, ChatRoomAlreadyExistsException {
+        final int identifier = RANDOM.nextInt();
+        String testEmail = String.format("vasya.chat.service%d@gmail.com", identifier);
+        UserDTO testUser = userService.register(new UserDTO("Vasya", testEmail, "pwd"));
+        testUserId = new UserId(testUser.id);
+        testToken = authenticationService.login(new LoginInfo(testEmail, "pwd"));
+        String testChatRoomName = "chat-room-" + identifier;
+        ChatRoomDTO chatRoomDTO = chatRoomService.create(testToken, testUserId, testChatRoomName);
+        testChatRoomId = new ChatRoomId(chatRoomDTO.id);
     }
 
     @Test
-    public void testCreateChat() {
+    public void test_create_chat() {
         try {
-            ChatRoomDTO chatRoomDTO = chatRoomService.create(token, userId, "chat");
+            ChatRoomDTO chatRoomDTO = chatRoomService.create(testToken, testUserId, "chat");
             assertNotNull("ChatRoomDTO must exists.", chatRoomDTO);
         } catch (ChatRoomAlreadyExistsException e) {
-            fail("Unexpected exception.");
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
     @Test
-    public void testCreateChatWithExistingName() {
+    public void test_create_chat_with_existing_name() {
         try {
-            chatRoomService.create(token, userId, "chat-1");
+            chatRoomService.create(testToken, testUserId, "chat-1");
+            chatRoomService.create(testToken, testUserId, "chat-1");
+
             fail();
         } catch (ChatRoomAlreadyExistsException e) {
             String result = e.getMessage();
@@ -77,18 +63,18 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testJoinUserToEmptyChat() {
+    public void test_join_user_yo_empty_chat() {
         try {
-            chatRoomService.joinToChatRoom(token, userId, chatRoomId);
+            chatRoomService.joinToChatRoom(testToken, testUserId, testChatRoomId);
         } catch (UserNotFoundException | ChatRoomNotFoundException e) {
-            fail(e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
     @Test
-    public void testJoinUserToNotExistingChat() {
+    public void test_join_user_to_not_existing_chat() {
         try {
-            chatRoomService.joinToChatRoom(token, userId, new ChatRoomId(34876L));
+            chatRoomService.joinToChatRoom(testToken, testUserId, new ChatRoomId(34876L));
             fail();
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
             String result = e.getMessage();
@@ -97,12 +83,11 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testDeleteUserFromChat() {
-        chatRoomRepository.findOne(chatRoomId.id).getUsers().add(user);
+    public void test_delete_user_from_chat() {
         try {
-            chatRoomService.leaveChatRoom(token, userId, chatRoomId);
+            chatRoomService.leaveChatRoom(testToken, testUserId, testChatRoomId);
         } catch (AuthenticationException | ChatRoomNotFoundException | UserNotFoundException e) {
-            fail("Unexpected exception.");
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 }

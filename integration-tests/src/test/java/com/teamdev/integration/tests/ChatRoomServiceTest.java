@@ -37,6 +37,7 @@ public class ChatRoomServiceTest {
     private static final String FIND_ALL_URL = CHAT_SERVICE_URL + "/chats/all";
     private static final String JOIN_URL = CHAT_SERVICE_URL + "/join";
     private static final String DELETE_URL = CHAT_SERVICE_URL + "/delete";
+    private static final Random RANDOM = new Random();
 
     private static UserDTO testUserDTO;
     private static UserId testUserId;
@@ -47,13 +48,13 @@ public class ChatRoomServiceTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Random random = new Random();
-        String testUserEmail = format("userservice%d@gmail.com", random.nextInt(1000));
-        String testChatRoomName = format("testChatForChatService%d", random.nextInt(1000));
+        final int identifier = RANDOM.nextInt();
+        String testUserEmail = format("userservice%d@gmail.com", identifier);
+        String testChatRoomName = format("testChatForChatService%d", identifier);
         UserDTO userDTO = new UserDTO(
                 "Vasya",
                 testUserEmail,
-                "pwd");
+                identifier + "");
         try {
             testUserDTO = getUserFromResponse(register(userDTO));
             testToken = getTokenFromResponse(AuthenticationServiceTest.login(
@@ -74,9 +75,9 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testCreateChat() {
-        Random random = new Random();
-        String testChatName = "chat-" + random.nextInt(1000);
+    public void test_create_chat() {
+        final int identifier = RANDOM.nextInt();
+        String testChatName = "chat-" + identifier;
         try {
             ChatRoomRequest chatRoomRequest = new ChatRoomRequest(testToken, testUserId, testChatName);
             ChatRoomDTO chatRoomDTO = getChatFromResponse(create(chatRoomRequest));
@@ -87,7 +88,7 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testCreateChatWithExistingName() {
+    public void test_create_chat_with_existing_name() {
         try {
             ChatRoomRequest chatRoomRequest = new ChatRoomRequest(testToken, testUserId, testChatDTO.name);
             HttpPost httpPost = new HttpPost(CREATE_URL);
@@ -105,7 +106,7 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testReadAllChats() {
+    public void test_read_all_chats() {
         try {
             HttpGet httpGet = new HttpGet(format("%s/?token=%s&userId=%d", FIND_ALL_URL, testToken.key, testUserDTO.id));
             CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -119,7 +120,7 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testJoinUserToChat() {
+    public void test_join_user_to_chat() {
         try {
             CloseableHttpResponse response = joinUserToChat(testToken, testUserId, testChatRoomId);
             String result = contentToString(response);
@@ -130,7 +131,7 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testJoinUserToNotExistingChat() {
+    public void test_join_user_to_not_existing_chat() {
         try {
             CloseableHttpResponse response = joinUserToChat(testToken, testUserId, new ChatRoomId(2938456));
             String message = contentToString(response);
@@ -144,7 +145,7 @@ public class ChatRoomServiceTest {
     }
 
     @Test
-    public void testDeleteUserFromChat() {
+    public void test_delete_user_from_chat() {
         try {
             UpdateChatRequest updateChatRequest = new UpdateChatRequest(
                     testToken,

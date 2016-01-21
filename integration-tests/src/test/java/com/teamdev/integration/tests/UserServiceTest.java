@@ -33,20 +33,21 @@ public class UserServiceTest {
     private static final String FIND_URL = USER_SERVICE_URL + "/find";
     private static final String REGISTER_URL = USER_SERVICE_URL + "/register";
     private static final String FIND_CHATS_URL = USER_SERVICE_URL + "/chats";
+    private static final Random RANDOM = new Random();
     private static UserDTO testUserDTO;
     private static Token testToken;
     private static CloseableHttpClient httpClient;
 
     @BeforeClass
     public static void beforeClass() {
-        Random random = new Random();
-        String testUserEmail = format("userservice%d@gmail.com", random.nextInt(1000));
-        String testChatRoomName = format("testChatForUserService%d", random.nextInt(1000));
+        final int identifier = RANDOM.nextInt();
+        String testUserEmail = format("userservice%d@gmail.com", identifier);
+        String testChatRoomName = format("testChatForUserService%d", identifier);
         try {
             UserDTO userDTO = new UserDTO(
                     "VasyaFromUserService",
                     testUserEmail,
-                    "userservice");
+                    identifier + "");
             testUserDTO = getUserFromResponse(register(userDTO));
             testToken = getTokenFromResponse(AuthenticationServiceTest.login(
                     new LoginInfo(userDTO.email, userDTO.password)));
@@ -64,11 +65,10 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testRegisterUser() {
-        Random random = new Random();
-        String testEmail = format("vasya%d@gmail.com", random.nextInt(1000));
-        String testPassword = format("pwd%d", random.nextInt(1000));
-        UserDTO registerDTO = new UserDTO("Vasya", testEmail, testPassword);
+    public void test_register_user() {
+        final int identifier = RANDOM.nextInt();
+        String testEmail = format("vasya%d@gmail.com", identifier);
+        UserDTO registerDTO = new UserDTO("Vasya", testEmail, identifier + "");
         try {
             CloseableHttpResponse response = register(registerDTO);
             UserDTO userDTO = getUserFromResponse(response);
@@ -79,7 +79,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testRegisterExistsUser() {
+    public void test_register_exists_user() {
         try {
             UserDTO registerDTO = new UserDTO("Vasya", "vasya@gmail.com", "pwd");
             register(registerDTO);
@@ -94,7 +94,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testRegisterUserWithIncorrectEmail() {
+    public void test_register_user_with_incorrect_email() {
         try {
             UserDTO registerDTO = new UserDTO("Vasya", "vasya-gmail.com", "pwd");
             CloseableHttpResponse response = register(registerDTO);
@@ -108,9 +108,9 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testFindById() {
-        Random random = new Random();
-        String testEmail = format("masha%d@gmail.com", random.nextInt(1000));
+    public void test_find_by_id() {
+        final int identifier = RANDOM.nextInt();
+        String testEmail = format("masha%d@gmail.com", identifier);
         try {
             UserDTO registerDTO = new UserDTO("Masha", testEmail, "pwd");
             CloseableHttpResponse httpResponse = register(registerDTO);
@@ -126,7 +126,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testFindByIdNotExistingUser() {
+    public void test_find_by_id_not_existing_user() {
         try {
             HttpGet httpGet = new HttpGet(format("%s/%d?token=%s&userId=%d", FIND_URL, 999, testToken.key, testUserDTO.id));
             CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -140,11 +140,12 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testFindAvailableChats() {
+    public void test_find_available_chats() {
         try {
             HttpGet httpGet = new HttpGet(format("%s/?token=%s&userId=%d", FIND_CHATS_URL, testToken.key, testUserDTO.id));
             CloseableHttpResponse response = httpClient.execute(httpGet);
             String json = contentToString(response);
+            LOG.info(json);
             ArrayList<ChatRoomDTO> availableChats = fromJson(json, new TypeToken<ArrayList<ChatRoomDTO>>() {
             }.getType());
 

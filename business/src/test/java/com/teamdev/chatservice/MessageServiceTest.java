@@ -10,15 +10,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class MessageServiceTest extends AbstractSpringContext {
+public class MessageServiceTest extends SpringContextRunner {
 
     private static final Random RANDOM = new Random();
+    public static final int FIVE_MINUTES = 1000 * 60 * 5;
 
     @Autowired
     private MessageService messageService;
@@ -46,28 +46,31 @@ public class MessageServiceTest extends AbstractSpringContext {
     }
 
     @Test
-    public void testSendMessage() {
+    public void test_send_message() {
         try {
             MessageDTO messageDTO = messageService.sendMessage(testToken, testUserId, testChatRoomId, "Hello, Masha!");
             assertNotNull(messageDTO);
         } catch (AuthenticationException | UserNotFoundException | ChatRoomNotFoundException e) {
-            fail("Unexpected exception.");
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
     @Test
-    public void testSendPrivateMessage() throws RegistrationException {
+    public void test_send_private_message() throws RegistrationException {
         UserDTO register = userService.register(new UserDTO("Vasya", "recipien@gmail.com", "pwd"));
         try {
+            messageService.sendPrivateMessage(testToken, testUserId, new UserId(register.id), "Hello");
             MessageDTO messageDTO = messageService.sendPrivateMessage(testToken, testUserId, new UserId(register.id), "Hello");
             assertNotNull(messageDTO);
+            int result = messageService.findAllAfterDate(testToken, testUserId, new Date(System.currentTimeMillis() - FIVE_MINUTES)).size();
+            assertTrue(result >= 2);
         } catch (AuthenticationException | UserNotFoundException e) {
-            fail("Unexpected exception.");
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
     @Test
-    public void testSendMessageToNotExistingChat() {
+    public void test_send_message_to_not_existing_chat() {
 
         try {
             messageService.sendMessage(testToken, testUserId, new ChatRoomId(999L), "Hello, Masha!");
@@ -78,7 +81,7 @@ public class MessageServiceTest extends AbstractSpringContext {
     }
 
     @Test
-    public void testSendMessageToNotExistingUser() {
+    public void test_send_message_to_not_existing_user() {
 
         try {
             messageService.sendPrivateMessage(testToken, testUserId, new UserId(999L), "Hello, Masha!");
@@ -89,8 +92,8 @@ public class MessageServiceTest extends AbstractSpringContext {
     }
 
     @Test
-    public void testFindAllAfterDate() throws Exception {
-        ArrayList<MessageDTO> result = messageService.findAllAfterDate(testToken, testUserId, new Date());
-        assertNotNull("Result can't be null.", result);
+    public void test_find_all_after_date() {
+        boolean result = messageService.findAllAfterDate(testToken, testUserId, new Date()).isEmpty();
+        assertTrue("Result can't be empty.", result);
     }
 }

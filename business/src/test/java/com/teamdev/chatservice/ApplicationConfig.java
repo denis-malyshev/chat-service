@@ -17,7 +17,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan("com.teamdev.chat.service.impl")
+@ComponentScan(basePackages = {"com.teamdev.chat.service.impl", "com.teamdev.chat.persistence"})
 @EnableJpaRepositories("com.teamdev.chat.persistence")
 @EnableTransactionManagement
 @EnableAspectJAutoProxy

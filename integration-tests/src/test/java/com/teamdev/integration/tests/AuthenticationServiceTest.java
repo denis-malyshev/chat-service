@@ -29,6 +29,7 @@ public class AuthenticationServiceTest {
     private static final String AUTHENTICATION_SERVICE_URL = HOME_URL + "/auth";
     private static final String LOGIN_URL = AUTHENTICATION_SERVICE_URL + "/login";
     private static final String LOGOUT_URL = AUTHENTICATION_SERVICE_URL + "/logout";
+    private static final Random RANDOM = new Random();
 
     private static LoginInfo validLoginInfo = new LoginInfo("vasya1@gmail.com", "pwd");
     private static LoginInfo invalidLoginInfo = new LoginInfo("vasya1@gmail.com", "password123");
@@ -37,12 +38,12 @@ public class AuthenticationServiceTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Random random = new Random();
-        String testUserEmail = format("authservice%d@gmail.com", random.nextInt(1000));
+        final int identifier = RANDOM.nextInt();
+        String testUserEmail = format("authservice%d@gmail.com", identifier);
         UserDTO userDTO = new UserDTO(
                 "VasyaFromAuthService",
                 testUserEmail,
-                "authservice");
+                identifier + "");
         try {
             validLoginInfo = new LoginInfo(userDTO.email, userDTO.password);
             getUserFromResponse(register(userDTO));
@@ -57,7 +58,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testLogin() {
+    public void test_login() {
         try {
             Token token = getTokenFromResponse(login(validLoginInfo));
             assertNotNull("Token must exists.", token);
@@ -67,7 +68,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testLogout() {
+    public void test_logout() {
         try {
             Token token = getTokenFromResponse(login(validLoginInfo));
             String result = logout(token.key);
@@ -78,7 +79,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testLoginWithInvalidPassword() {
+    public void test_login_with_invalid_password() {
         try {
             HttpPost httpPost = new HttpPost(LOGIN_URL);
             httpPost.setHeader("Content-Type", "application/json");

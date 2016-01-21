@@ -37,6 +37,7 @@ public class MessageServiceTest {
     private static final String SEND_URL = MESSAGE_SERVICE_URL + "/send";
     private static final String SEND_PRIVATE_URL = MESSAGE_SERVICE_URL + "/send_private";
     private static final String FIND_ALL_AFTER = MESSAGE_SERVICE_URL + "/find_all_after";
+    private static final Random RANDOM = new Random();
     public static final int FIVE_MINUTES = 1000 * 60 * 5;
 
     private static UserId testUserId;
@@ -46,13 +47,13 @@ public class MessageServiceTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Random random = new Random();
-        String testUserEmail = format("messageservice%d@gmail.com", random.nextInt(1000));
-        String testChatRoomName = format("testChatForMessageService%d", random.nextInt(1000));
+        final int identifier = RANDOM.nextInt();
+        String testUserEmail = format("messageservice%d@gmail.com", identifier);
+        String testChatRoomName = format("testChatForMessageService%d", identifier);
         UserDTO userDTO = new UserDTO(
                 "VasyaFromMessageService",
                 testUserEmail,
-                "messaheservice");
+                identifier + "");
         try {
             UserDTO testUserDTO = getUserFromResponse(register(userDTO));
             testToken = getTokenFromResponse(AuthenticationServiceTest.login(
@@ -73,7 +74,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void testSendMessageToExistingChat() {
+    public void test_send_message_to_existing_chat() {
         try {
             HttpPost httpPost = new HttpPost(SEND_URL);
             MessageRequest messageRequest = new MessageRequest(testToken, testUserId, testChatRoomId.id, "Hello!");
@@ -83,14 +84,14 @@ public class MessageServiceTest {
             CloseableHttpResponse response = httpClient.execute(httpPost);
             String json = contentToString(response);
             MessageDTO messageDTO = fromJson(json, MessageDTO.class);
-            assertEquals("ChatRoom names must be equals.", messageRequest.text, messageDTO.text);
+            assertEquals("Message texts must be equals.", messageRequest.text, messageDTO.text);
         } catch (IOException e) {
             fail("Unexpected exception.");
         }
     }
 
     @Test
-    public void testSendMessageToNotExistingChat() {
+    public void test_send_message_to_not_existing_chat() {
         try {
             HttpPost httpPost = new HttpPost(SEND_URL);
             MessageRequest messageRequest = new MessageRequest(testToken, testUserId, 999, "Hello!");
@@ -108,9 +109,9 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void testSendPrivateMessage() {
-        Random random = new Random();
-        String testEmail = format("serega%d@gmail.com", random.nextInt(1000));
+    public void test_send_private_message() {
+        final int identifier = RANDOM.nextInt();
+        String testEmail = format("serega%d@gmail.com", identifier);
         try {
             UserDTO userDTO = new UserDTO("Serega", testEmail, "pwd");
             CloseableHttpResponse httpResponse = register(userDTO);
@@ -131,7 +132,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void testSendPrivateMessageToNotExistingUser() {
+    public void test_send_private_message_to_not_existing_user() {
         try {
             HttpPost httpPost = new HttpPost(SEND_PRIVATE_URL);
             MessageRequest messageRequest = new MessageRequest(testToken, testUserId, 999, "Hello!");
@@ -149,7 +150,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void testFindAllMessagesAfterDate() {
+    public void test_find_all_messages_after_date() {
         try {
             HttpPost httpPost = new HttpPost(FIND_ALL_AFTER);
             ReadMessagesRequest readMessagesRequest = new ReadMessagesRequest(testToken, testUserId, new Date(System.currentTimeMillis() - FIVE_MINUTES));
