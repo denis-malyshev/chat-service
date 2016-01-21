@@ -1,11 +1,9 @@
 package com.teamdev.chatservice;
 
-import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chatservice.wrappers.dto.UserDTO;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
-import org.apache.log4j.Logger;
+import com.teamdev.chatservice.wrappers.dto.UserDTO;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,12 +11,8 @@ import static org.junit.Assert.*;
 
 public class UserServiceTest extends SpringContextRunner {
 
-    private static final Logger LOG = Logger.getLogger(UserServiceTest.class);
-
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
     private UserDTO testUserDTO = new UserDTO("Vasya", "vasya.user.service@gmail.com", "pwd");
 
     @Test
