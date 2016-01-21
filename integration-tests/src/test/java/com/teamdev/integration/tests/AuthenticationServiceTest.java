@@ -1,8 +1,8 @@
 package com.teamdev.integration.tests;
 
-import com.teamdev.chat.service.impl.dto.LoginInfo;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserDTO;
+import com.teamdev.chatservice.wrappers.dto.LoginInfo;
+import com.teamdev.chatservice.wrappers.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.UserDTO;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;

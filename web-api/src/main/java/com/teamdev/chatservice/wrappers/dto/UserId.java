@@ -1,4 +1,4 @@
-package com.teamdev.chat.service.impl.dto;
+package com.teamdev.chatservice.wrappers.dto;
 
 public class UserId {
 

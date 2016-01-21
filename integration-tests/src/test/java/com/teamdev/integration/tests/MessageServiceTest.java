@@ -1,7 +1,7 @@
 package com.teamdev.integration.tests;
 
 import com.google.common.reflect.TypeToken;
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chatservice.wrappers.ChatRoomRequest;
 import com.teamdev.chatservice.wrappers.MessageRequest;
 import com.teamdev.chatservice.wrappers.ReadMessagesRequest;

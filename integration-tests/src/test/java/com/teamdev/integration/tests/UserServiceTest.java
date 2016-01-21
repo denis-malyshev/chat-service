@@ -1,7 +1,7 @@
 package com.teamdev.integration.tests;
 
 import com.google.gson.reflect.TypeToken;
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chatservice.wrappers.ChatRoomRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

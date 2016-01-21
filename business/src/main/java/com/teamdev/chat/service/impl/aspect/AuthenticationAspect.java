@@ -1,8 +1,8 @@
 package com.teamdev.chat.service.impl.aspect;
 
 import com.teamdev.chat.service.AuthenticationService;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserId;
+import com.teamdev.chatservice.wrappers.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.UserId;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,7 +18,7 @@ public class AuthenticationAspect {
     private AuthenticationService authenticationService;
 
     @Pointcut("execution (* com.teamdev.chat.service.*.*" +
-            "(com.teamdev.chat.service.impl.dto.Token,com.teamdev.chat.service.impl.dto.UserId,..)) &&" +
+            "(com.teamdev.chatservice.wrappers.dto.Token,com.teamdev.chatservice.wrappers.dto.UserId,..)) &&" +
             " !execution(* validate(..))")
     private void authPointcut() {
     }

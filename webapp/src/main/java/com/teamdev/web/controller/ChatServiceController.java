@@ -1,9 +1,9 @@
 package com.teamdev.web.controller;
 
 import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserId;
+import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
+import com.teamdev.chatservice.wrappers.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;

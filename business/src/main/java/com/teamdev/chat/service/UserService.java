@@ -1,9 +1,9 @@
 package com.teamdev.chat.service;
 
-import com.teamdev.chat.service.impl.dto.ChatRoomDTO;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserDTO;
-import com.teamdev.chat.service.impl.dto.UserId;
+import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
+import com.teamdev.chatservice.wrappers.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.UserDTO;
+import com.teamdev.chatservice.wrappers.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;

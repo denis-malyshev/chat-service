@@ -1,16 +1,13 @@
 package com.teamdev.chatservice;
 
 import com.teamdev.chat.persistence.UserRepository;
-import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.dto.UserDTO;
+import com.teamdev.chatservice.wrappers.dto.UserDTO;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Collection;
 
 import static org.junit.Assert.*;
 

@@ -1,8 +1,8 @@
 package com.teamdev.web.controller;
 
 import com.teamdev.chat.service.AuthenticationService;
-import com.teamdev.chat.service.impl.dto.LoginInfo;
-import com.teamdev.chat.service.impl.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.LoginInfo;
+import com.teamdev.chatservice.wrappers.dto.Token;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

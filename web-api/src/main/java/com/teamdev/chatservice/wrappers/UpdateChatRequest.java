@@ -1,8 +1,8 @@
 package com.teamdev.chatservice.wrappers;
 
-import com.teamdev.chat.service.impl.dto.ChatRoomId;
-import com.teamdev.chat.service.impl.dto.Token;
-import com.teamdev.chat.service.impl.dto.UserId;
+import com.teamdev.chatservice.wrappers.dto.ChatRoomId;
+import com.teamdev.chatservice.wrappers.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.UserId;
 
 public class UpdateChatRequest {
 

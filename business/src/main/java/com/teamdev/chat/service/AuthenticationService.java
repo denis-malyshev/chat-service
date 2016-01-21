@@ -1,6 +1,6 @@
 package com.teamdev.chat.service;
 
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 
 public interface AuthenticationService {

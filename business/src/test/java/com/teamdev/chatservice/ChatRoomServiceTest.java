@@ -3,7 +3,7 @@ package com.teamdev.chatservice;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.ChatRoomService;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chat.service.impl.dto.*;
+import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chat.service.impl.exception.*;
 import org.junit.Before;
 import org.junit.Test;
