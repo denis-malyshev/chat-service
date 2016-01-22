@@ -1,14 +1,12 @@
 package com.teamdev.chat.service;
 
-import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
-import com.teamdev.chatservice.wrappers.dto.Token;
-import com.teamdev.chatservice.wrappers.dto.UserDTO;
-import com.teamdev.chatservice.wrappers.dto.UserId;
+import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public interface UserService {
 
@@ -17,5 +15,9 @@ public interface UserService {
 
     UserDTO findById(Token token, UserId searcherId, UserId userId) throws UserNotFoundException;
 
-    ArrayList<ChatRoomDTO> findAvailableChats(Token token, UserId userId);
+    Collection<UserDTO> findUsersByChatRoomId(Token token, UserId userId, ChatRoomId chatRoomId);
+
+    String delete(Token token, UserId userId) throws UserNotFoundException;
+
+    Collection<ChatRoomDTO> findAvailableChats(Token token, UserId userId);
 }

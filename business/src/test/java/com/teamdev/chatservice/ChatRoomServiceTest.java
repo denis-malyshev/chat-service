@@ -3,12 +3,13 @@ package com.teamdev.chatservice;
 import com.teamdev.chat.service.AuthenticationService;
 import com.teamdev.chat.service.ChatRoomService;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chat.service.impl.exception.*;
+import com.teamdev.chatservice.wrappers.dto.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import static org.junit.Assert.*;

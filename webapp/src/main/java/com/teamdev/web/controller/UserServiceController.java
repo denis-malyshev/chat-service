@@ -1,13 +1,13 @@
 package com.teamdev.web.controller;
 
 import com.teamdev.chat.service.UserService;
+import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import com.teamdev.chat.service.impl.exception.RegistrationException;
+import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
 import com.teamdev.chatservice.wrappers.dto.Token;
 import com.teamdev.chatservice.wrappers.dto.UserDTO;
 import com.teamdev.chatservice.wrappers.dto.UserId;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.RegistrationException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 @RequestMapping("/user")
 @Controller
@@ -54,8 +54,20 @@ public final class UserServiceController {
 
     @RequestMapping(value = "/chats", params = {"token", "userId"}, method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<ArrayList<ChatRoomDTO>> findAvailableChats(@RequestParam String token, @RequestParam long userId) {
+    public ResponseEntity<Collection<ChatRoomDTO>> findAvailableChats(@RequestParam String token, @RequestParam long userId) {
         return new ResponseEntity<>(userService.findAvailableChats(new Token(token), new UserId(userId)), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/delete", params = {"token", "userId"}, method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity<String> delete(@RequestParam String token, @RequestParam long userId)
+            throws UserNotFoundException {
+        try {
+            return new ResponseEntity<>(userService.delete(new Token(token), new UserId(userId)), HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        }
     }
 
 }

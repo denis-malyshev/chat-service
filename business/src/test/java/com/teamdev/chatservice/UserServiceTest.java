@@ -13,12 +13,12 @@ public class UserServiceTest extends SpringContextRunner {
 
     @Autowired
     private UserService userService;
-    private UserDTO testUserDTO = new UserDTO("Vasya", "vasya.user.service@gmail.com", "pwd");
 
     @Test
     public void test_registration_user() {
         try {
-            UserDTO register = userService.register(new UserDTO("Vasya", "vasya.use1r.service@gmail.com", "pwd"));
+            UserDTO userDTO = new UserDTO("Vasya", "registration.vasya@gmail.com", "pwd");
+            UserDTO register = userService.register(userDTO);
 
             assertNotNull("User must be exist.", register);
         } catch (AuthenticationException | RegistrationException e) {
@@ -29,13 +29,14 @@ public class UserServiceTest extends SpringContextRunner {
     @Test
     public void test_registration_user_with_existing_email() {
         try {
-            userService.register(testUserDTO);
-            userService.register(testUserDTO);
+            UserDTO userDTO = new UserDTO("Vasya", "vasya.double.registration@gmail.com", "pwd");
+            userService.register(userDTO);
+            userService.register(userDTO);
 
             fail();
         } catch (AuthenticationException e) {
             String result = e.getMessage();
-            assertEquals("Exception message must be correct.", "User with the same mail already exists.", result);
+            assertEquals("Exception message must be correct.", "User with the same email already exists.", result);
         } catch (RegistrationException e) {
             fail("Unexpected exception: " + e.getMessage());
         }

@@ -1,9 +1,10 @@
 package com.teamdev.integration.tests;
 
 import com.google.gson.reflect.TypeToken;
-import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chatservice.wrappers.ChatRoomRequest;
+import com.teamdev.chatservice.wrappers.dto.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -20,6 +21,7 @@ import java.util.Random;
 
 import static com.teamdev.integration.tests.AuthenticationServiceTest.getTokenFromResponse;
 import static com.teamdev.integration.tests.ChatRoomServiceTest.*;
+import static com.teamdev.integration.tests.MessageServiceTest.sendMessage;
 import static com.teamdev.utils.HttpResponseConverter.contentToString;
 import static com.teamdev.utils.JsonHelper.fromJson;
 import static com.teamdev.utils.JsonHelper.toJson;
@@ -33,13 +35,16 @@ public class UserServiceTest {
     private static final String FIND_URL = USER_SERVICE_URL + "/find";
     private static final String REGISTER_URL = USER_SERVICE_URL + "/register";
     private static final String FIND_CHATS_URL = USER_SERVICE_URL + "/chats";
+    private static final String DELETE_USER_URL = USER_SERVICE_URL + "/delete";
     private static final Random RANDOM = new Random();
-    private static UserDTO testUserDTO;
-    private static Token testToken;
-    private static CloseableHttpClient httpClient;
+    private UserDTO testUserDTO;
+    private ChatRoomId testChatRoomId;
+    private Token testToken;
+    private CloseableHttpClient httpClient;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @Before
+    public void setUp() {
+        httpClient = HttpClients.createDefault();
         final int identifier = RANDOM.nextInt();
         String testUserEmail = format("userservice%d@gmail.com", identifier);
         String testChatRoomName = format("testChatForUserService%d", identifier);
@@ -53,15 +58,11 @@ public class UserServiceTest {
                     new LoginInfo(userDTO.email, userDTO.password)));
             ChatRoomDTO testChatDTO = getChatFromResponse(create(
                     new ChatRoomRequest(testToken, new UserId(testUserDTO.id), testChatRoomName)));
+            testChatRoomId = new ChatRoomId(testChatDTO.id);
             joinUserToChat(testToken, new UserId(testUserDTO.id), new ChatRoomId(testChatDTO.id));
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
-    }
-
-    @Before
-    public void setUp() {
-        httpClient = HttpClients.createDefault();
     }
 
     @Test
@@ -87,7 +88,7 @@ public class UserServiceTest {
             int statusCode = response.getStatusLine().getStatusCode();
             String message = contentToString(response);
             assertEquals(403, statusCode);
-            assertEquals("Error message must be correct.", "User with the same mail already exists.", message);
+            assertEquals("Error message must be correct.", "User with the same email already exists.", message);
         } catch (IOException e) {
             fail("Unexpected exception.");
         }
@@ -150,6 +151,33 @@ public class UserServiceTest {
             }.getType());
 
             assertNotNull("ChatRooms must exists.", availableChats);
+        } catch (IOException e) {
+            fail("Unexpected exception.");
+        }
+    }
+
+    @Test
+    public void test_delete_user() {
+        try {
+            HttpDelete httpDelete = new HttpDelete(format("%s/?token=%s&userId=%d", DELETE_USER_URL, testToken.key, testUserDTO.id));
+            CloseableHttpResponse response = httpClient.execute(httpDelete);
+            String result = contentToString(response);
+
+            assertEquals(format("User[%d] was successfully deleted.", testUserDTO.id), result);
+        } catch (IOException e) {
+            fail("Unexpected exception.");
+        }
+    }
+
+    @Test
+    public void test_delete_a_user_who_sent_a_message() {
+        try {
+            sendMessage(testToken, new UserId(testUserDTO.id), testChatRoomId.id, "Hello!", false);
+            HttpDelete httpDelete = new HttpDelete(format("%s/?token=%s&userId=%d", DELETE_USER_URL, testToken.key, testUserDTO.id));
+            CloseableHttpResponse response = httpClient.execute(httpDelete);
+            String result = contentToString(response);
+
+            assertEquals(format("User[%d] was successfully deleted.", testUserDTO.id), result);
         } catch (IOException e) {
             fail("Unexpected exception.");
         }

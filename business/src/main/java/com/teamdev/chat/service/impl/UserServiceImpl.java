@@ -1,16 +1,15 @@
 package com.teamdev.chat.service.impl;
 
+import com.teamdev.chat.persistence.MessageRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.ChatRoom;
+import com.teamdev.chat.persistence.dom.Message;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.UserService;
-import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
-import com.teamdev.chatservice.wrappers.dto.Token;
-import com.teamdev.chatservice.wrappers.dto.UserDTO;
-import com.teamdev.chatservice.wrappers.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import com.teamdev.chatservice.wrappers.dto.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -35,19 +35,21 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MessageRepository messageRepository;
 
     public UserServiceImpl() {
     }
 
     public UserDTO register(UserDTO userDTO)
-            throws AuthenticationException, RegistrationException {
+            throws RegistrationException {
 
         LOG.info(format("Registration user %s.", userDTO.email));
 
         emailValidation(userDTO.email);
 
         if (userRepository.count() > 0 && userRepository.findByEmail(userDTO.email) != null) {
-            throw new AuthenticationException("User with the same mail already exists.");
+            throw new AuthenticationException("User with the same email already exists.");
         }
 
         String passwordHash = createHash(userDTO.password);
@@ -69,6 +71,43 @@ public class UserServiceImpl implements UserService {
 
         LOG.info(format("User %s was successfully found.", user.getEmail()));
         return new UserDTO(userId.id, user.getFirstName(), user.getEmail());
+    }
+
+    @Override
+    public Collection<UserDTO> findUsersByChatRoomId(Token token, UserId userId, ChatRoomId chatRoomId) {
+        return userRepository.findUsersByChatRoomId(chatRoomId.id).stream().
+                map(user -> new UserDTO(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getEmail()
+                )).collect(Collectors.toList());
+    }
+
+    @Override
+    public String delete(Token token, UserId userId) throws UserNotFoundException {
+        LOG.info(format("Trying to delete user with id[%d].", userId.id));
+
+        if (!userRepository.exists(userId.id)) {
+            throw new UserNotFoundException(format("User with id[%d] not exists.", userId.id));
+        }
+
+        User user = userRepository.findOne(userId.id);
+        List<Message> receivedMessages = user.getReceivedMessages();
+        for (Message message : receivedMessages) {
+            message.setReceiver(null);
+        }
+        user.setReceivedMessages(receivedMessages);
+        List<Message> sentMessages = user.getSentMessages();
+        for (Message message : sentMessages) {
+            message.setSender(null);
+        }
+        user.setSentMessages(sentMessages);
+        userRepository.save(user);
+
+        userRepository.delete(userId.id);
+        String result = format("User[%d] was successfully deleted.", userId.id);
+        LOG.info(result);
+        return result;
     }
 
     @Override
