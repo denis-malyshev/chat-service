@@ -43,6 +43,18 @@ public class User {
         this.token = token;
     }
 
+    public void setSentMessages(List<Message> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public void setReceivedMessages(List<Message> receivedMessages) {
+        this.receivedMessages = receivedMessages;
+    }
+
+    public void setChatRooms(Set<ChatRoom> chatRooms) {
+        this.chatRooms = chatRooms;
+    }
+
     public List<Message> getSentMessages() {
         return sentMessages;
     }

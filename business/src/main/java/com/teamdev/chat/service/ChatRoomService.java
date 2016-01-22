@@ -10,6 +10,7 @@ import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public interface ChatRoomService {
 
@@ -20,6 +21,8 @@ public interface ChatRoomService {
 
     void leaveChatRoom(Token token, UserId userId, ChatRoomId chatRoomId)
             throws AuthenticationException, ChatRoomNotFoundException, UserNotFoundException;
+
+    Collection<ChatRoomDTO> findByUserId(Token token, UserId userId);
 
     ArrayList<ChatRoomDTO> findAll(Token token, UserId userId);
 

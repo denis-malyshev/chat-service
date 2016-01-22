@@ -5,20 +5,21 @@ import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
-import com.teamdev.chatservice.wrappers.dto.ChatRoomId;
-import com.teamdev.chatservice.wrappers.dto.Token;
-import com.teamdev.chatservice.wrappers.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
+import com.teamdev.chatservice.wrappers.dto.ChatRoomId;
+import com.teamdev.chatservice.wrappers.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.UserId;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -77,8 +78,19 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         boolean removeChat = chatRoom.getUsers().remove(user);
 
         if (removeChat) {
-            LOG.info(String.format("User[%d] was successfully deleted from chat-room[%d].", userId.id, chatRoomId.id));
+            LOG.info(format("User[%d] was successfully deleted from chat-room[%d].", userId.id, chatRoomId.id));
         }
+    }
+
+    @Override
+    public ArrayList<ChatRoomDTO> findByUserId(Token token, UserId userId) {
+        return chatRoomRepository.findChatRoomsByUserId(userId.id).stream().
+                map(chatRoom -> new ChatRoomDTO(
+                        chatRoom.getId(),
+                        chatRoom.getName(),
+                        0,
+                        0
+                )).collect(Collectors.toCollection(ArrayList<ChatRoomDTO>::new));
     }
 
     @Override

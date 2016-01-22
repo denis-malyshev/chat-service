@@ -39,15 +39,16 @@ public class ChatRoomServiceTest {
     private static final String DELETE_URL = CHAT_SERVICE_URL + "/delete";
     private static final Random RANDOM = new Random();
 
-    private static UserDTO testUserDTO;
-    private static UserId testUserId;
-    private static Token testToken;
-    private static ChatRoomDTO testChatDTO;
-    private static ChatRoomId testChatRoomId;
-    private static CloseableHttpClient httpClient;
+    private UserDTO testUserDTO;
+    private UserId testUserId;
+    private Token testToken;
+    private ChatRoomDTO testChatDTO;
+    private ChatRoomId testChatRoomId;
+    private CloseableHttpClient httpClient;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @Before
+    public void setUp() {
+        httpClient = HttpClients.createDefault();
         final int identifier = RANDOM.nextInt();
         String testUserEmail = format("userservice%d@gmail.com", identifier);
         String testChatRoomName = format("testChatForChatService%d", identifier);
@@ -67,11 +68,6 @@ public class ChatRoomServiceTest {
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
-    }
-
-    @Before
-    public void setUp() {
-        httpClient = HttpClients.createDefault();
     }
 
     @Test

@@ -1,10 +1,10 @@
 package com.teamdev.integration.tests;
 
 import com.google.common.reflect.TypeToken;
-import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chatservice.wrappers.ChatRoomRequest;
 import com.teamdev.chatservice.wrappers.MessageRequest;
 import com.teamdev.chatservice.wrappers.ReadMessagesRequest;
+import com.teamdev.chatservice.wrappers.dto.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -45,8 +45,9 @@ public class MessageServiceTest {
     private static ChatRoomId testChatRoomId;
     private static CloseableHttpClient httpClient;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @Before
+    public  void setUp() {
+        httpClient = HttpClients.createDefault();
         final int identifier = RANDOM.nextInt();
         String testUserEmail = format("messageservice%d@gmail.com", identifier);
         String testChatRoomName = format("testChatForMessageService%d", identifier);
@@ -68,23 +69,14 @@ public class MessageServiceTest {
         }
     }
 
-    @Before
-    public void setUp() {
-        httpClient = HttpClients.createDefault();
-    }
-
     @Test
     public void test_send_message_to_existing_chat() {
         try {
-            HttpPost httpPost = new HttpPost(SEND_URL);
-            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, testChatRoomId.id, "Hello!");
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(toJson(messageRequest)));
-
-            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String text = "Hello!";
+            CloseableHttpResponse response = sendMessage(testToken, testUserId, testChatRoomId.id, text, false);
             String json = contentToString(response);
             MessageDTO messageDTO = fromJson(json, MessageDTO.class);
-            assertEquals("Message texts must be equals.", messageRequest.text, messageDTO.text);
+            assertEquals("Message texts must be equals.", text, messageDTO.text);
         } catch (IOException e) {
             fail("Unexpected exception.");
         }
@@ -93,12 +85,7 @@ public class MessageServiceTest {
     @Test
     public void test_send_message_to_not_existing_chat() {
         try {
-            HttpPost httpPost = new HttpPost(SEND_URL);
-            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, 999, "Hello!");
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(toJson(messageRequest)));
-
-            CloseableHttpResponse response = httpClient.execute(httpPost);
+            CloseableHttpResponse response = sendMessage(testToken, testUserId, 999, "Hello!", false);
             String message = contentToString(response);
             int result = response.getStatusLine().getStatusCode();
             assertEquals("Error code must be correct.", 404, result);
@@ -117,15 +104,10 @@ public class MessageServiceTest {
             CloseableHttpResponse httpResponse = register(userDTO);
             UserDTO registeredUser = fromJson(contentToString(httpResponse), UserDTO.class);
 
-            HttpPost httpPost = new HttpPost(SEND_PRIVATE_URL);
-            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, registeredUser.id, "Hello!");
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(toJson(messageRequest)));
-
-            CloseableHttpResponse response = httpClient.execute(httpPost);
+            CloseableHttpResponse response = sendMessage(testToken, testUserId, registeredUser.id, "Hello!", true);
             String json = contentToString(response);
             MessageDTO messageDTO = fromJson(json, MessageDTO.class);
-            assertEquals("Text messages must be equals.", messageRequest.text, messageDTO.text);
+            assertEquals("Text messages must be equals.", "Hello!", messageDTO.text);
         } catch (IOException e) {
             fail("Unexpected exception.");
         }
@@ -134,12 +116,7 @@ public class MessageServiceTest {
     @Test
     public void test_send_private_message_to_not_existing_user() {
         try {
-            HttpPost httpPost = new HttpPost(SEND_PRIVATE_URL);
-            MessageRequest messageRequest = new MessageRequest(testToken, testUserId, 999, "Hello!");
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(toJson(messageRequest)));
-
-            CloseableHttpResponse response = httpClient.execute(httpPost);
+            CloseableHttpResponse response = sendMessage(testToken, testUserId, 999, "Hello!", true);
             String message = contentToString(response);
             int result = response.getStatusLine().getStatusCode();
             assertEquals("Error code must be correct.", 404, result);
@@ -165,5 +142,20 @@ public class MessageServiceTest {
         } catch (IOException e) {
             fail("Unexpected exception.");
         }
+    }
+
+    public static CloseableHttpResponse sendMessage(
+            Token token,
+            UserId userId,
+            long receiverId,
+            String text,
+            boolean isPrivate) throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(isPrivate ? SEND_PRIVATE_URL : SEND_URL);
+        MessageRequest messageRequest = new MessageRequest(token, userId, receiverId, text);
+        httpPost.setHeader("Content-Type", "application/json");
+        httpPost.setEntity(new StringEntity(toJson(messageRequest)));
+
+        return httpClient.execute(httpPost);
     }
 }
