@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+@CrossOrigin
 @RequestMapping("/user")
 @Controller
 public final class UserServiceController {
@@ -31,6 +32,7 @@ public final class UserServiceController {
     public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO)
             throws AuthenticationException, RegistrationException {
         try {
+            LOG.info(userDTO);
             return new ResponseEntity<>(userService.register(userDTO), HttpStatus.OK);
         } catch (AuthenticationException | RegistrationException e) {
             LOG.error(e.getMessage(), e);

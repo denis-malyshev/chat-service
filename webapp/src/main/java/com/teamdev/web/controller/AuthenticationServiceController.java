@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RequestMapping("/auth")
 @Controller
 public final class AuthenticationServiceController {
