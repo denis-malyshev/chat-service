@@ -7,13 +7,13 @@ import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.Message;
 import com.teamdev.chat.persistence.dom.User;
 import com.teamdev.chat.service.MessageService;
+import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
+import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import com.teamdev.chatservice.wrappers.dto.ChatRoomId;
 import com.teamdev.chatservice.wrappers.dto.MessageDTO;
 import com.teamdev.chatservice.wrappers.dto.Token;
 import com.teamdev.chatservice.wrappers.dto.UserId;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,6 +84,18 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, Date date) {
         List<Message> messages = messageRepository.findByCreatingTimeAfter(date);
+        return messages.stream().map(message ->
+                new MessageDTO(
+                        message.getId(),
+                        message.getText(),
+                        message.getCreatingTime())).
+                collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
+    }
+
+    @Override
+    public ArrayList<MessageDTO> findMessagesByChatRoomIdAfterDate(
+            Token token, UserId userId, ChatRoomId chatRoomId, Date date) {
+        List<Message> messages = messageRepository.findMessagesByChatRoomIdAfterDate(chatRoomId.id, date);
         return messages.stream().map(message ->
                 new MessageDTO(
                         message.getId(),

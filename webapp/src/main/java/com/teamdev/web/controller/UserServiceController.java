@@ -45,7 +45,7 @@ public final class UserServiceController {
     public ResponseEntity<UserDTO> findById(@RequestParam String token, @RequestParam long userId, @PathVariable long id) throws UserNotFoundException {
         try {
             return new ResponseEntity<>(userService.findById(
-                    new Token(token),
+                    new Token(token, userId),
                     new UserId(userId),
                     new UserId(id)), HttpStatus.OK);
         } catch (UserNotFoundException e) {
@@ -57,7 +57,7 @@ public final class UserServiceController {
     @RequestMapping(value = "/chats", params = {"token", "userId"}, method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Collection<ChatRoomDTO>> findAvailableChats(@RequestParam String token, @RequestParam long userId) {
-        return new ResponseEntity<>(userService.findAvailableChats(new Token(token), new UserId(userId)), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findAvailableChats(new Token(token, userId), new UserId(userId)), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/delete", params = {"token", "userId"}, method = RequestMethod.DELETE)
@@ -65,7 +65,7 @@ public final class UserServiceController {
     public ResponseEntity<String> delete(@RequestParam String token, @RequestParam long userId)
             throws UserNotFoundException {
         try {
-            return new ResponseEntity<>(userService.delete(new Token(token), new UserId(userId)), HttpStatus.OK);
+            return new ResponseEntity<>(userService.delete(new Token(token, userId), new UserId(userId)), HttpStatus.OK);
         } catch (UserNotFoundException e) {
             LOG.error(e.getMessage(), e);
             throw e;

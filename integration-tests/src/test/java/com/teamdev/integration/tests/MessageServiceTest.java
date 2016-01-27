@@ -37,6 +37,7 @@ public class MessageServiceTest {
     private static final String SEND_URL = MESSAGE_SERVICE_URL + "/send";
     private static final String SEND_PRIVATE_URL = MESSAGE_SERVICE_URL + "/send_private";
     private static final String FIND_ALL_AFTER = MESSAGE_SERVICE_URL + "/find_all_after";
+    private static final String FIND_ALL_BY_CHAT_AFTER = MESSAGE_SERVICE_URL + "/find_all_by_chat_after";
     private static final Random RANDOM = new Random();
     public static final int FIVE_MINUTES = 1000 * 60 * 5;
 
@@ -46,7 +47,7 @@ public class MessageServiceTest {
     private static CloseableHttpClient httpClient;
 
     @Before
-    public  void setUp() {
+    public void setUp() {
         httpClient = HttpClients.createDefault();
         final int identifier = RANDOM.nextInt();
         String testUserEmail = format("messageservice%d@gmail.com", identifier);
@@ -131,6 +132,24 @@ public class MessageServiceTest {
         try {
             HttpPost httpPost = new HttpPost(FIND_ALL_AFTER);
             ReadMessagesRequest readMessagesRequest = new ReadMessagesRequest(testToken, testUserId, new Date(System.currentTimeMillis() - FIVE_MINUTES));
+            httpPost.setHeader("Content-Type", "application/json");
+            httpPost.setEntity(new StringEntity(toJson(readMessagesRequest)));
+
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String json = contentToString(response);
+            ArrayList<MessageDTO> result = fromJson(json, new TypeToken<ArrayList<MessageDTO>>() {
+            }.getType());
+            assertNotNull("Result can't be null.", result);
+        } catch (IOException e) {
+            fail("Unexpected exception.");
+        }
+    }
+
+    @Test
+    public void test_find_all_by_chat_messages_after_date() {
+        try {
+            HttpPost httpPost = new HttpPost(FIND_ALL_BY_CHAT_AFTER);
+            ReadMessagesRequest readMessagesRequest = new ReadMessagesRequest(testToken, testUserId, new Date(System.currentTimeMillis() - FIVE_MINUTES), testChatRoomId);
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(new StringEntity(toJson(readMessagesRequest)));
 

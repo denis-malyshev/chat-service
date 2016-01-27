@@ -32,7 +32,7 @@ public final class ChatServiceController {
     @RequestMapping(value = "/chats/all", params = {"token", "userId"}, method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<ArrayList<ChatRoomDTO>> readAll(@RequestParam String token, @RequestParam long userId) {
-        return new ResponseEntity<>(chatRoomService.findAll(new Token(token), new UserId(userId)), HttpStatus.OK);
+        return new ResponseEntity<>(chatRoomService.findAll(new Token(token, userId), new UserId(userId)), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/join", method = RequestMethod.PUT)

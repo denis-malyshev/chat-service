@@ -73,4 +73,19 @@ public class MessageServiceController {
             throw e;
         }
     }
+
+    @RequestMapping(value = "/find_all_by_chat_after", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<ArrayList<MessageDTO>> findAllByChatRoomIdAfterDate(@RequestBody ReadMessagesRequest readMessagesRequest) {
+        try {
+            return new ResponseEntity<>(messageService.findMessagesByChatRoomIdAfterDate(
+                    readMessagesRequest.token,
+                    readMessagesRequest.userId,
+                    readMessagesRequest.chatRoomId,
+                    readMessagesRequest.date), HttpStatus.OK);
+        } catch (AuthenticationException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        }
+    }
 }

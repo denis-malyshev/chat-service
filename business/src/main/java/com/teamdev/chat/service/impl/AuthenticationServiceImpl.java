@@ -43,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setToken(token);
         userRepository.save(user);
         LOG.info(String.format("User %s logged successfully.", loginInfo.email));
-        return new Token(token.getTokenKey());
+        return new Token(token.getTokenKey(), user.getId());
     }
 
     @Override

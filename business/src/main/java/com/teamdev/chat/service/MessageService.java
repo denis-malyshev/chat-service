@@ -1,12 +1,12 @@
 package com.teamdev.chat.service;
 
+import com.teamdev.chat.service.impl.exception.AuthenticationException;
+import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
+import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import com.teamdev.chatservice.wrappers.dto.ChatRoomId;
 import com.teamdev.chatservice.wrappers.dto.MessageDTO;
 import com.teamdev.chatservice.wrappers.dto.Token;
 import com.teamdev.chatservice.wrappers.dto.UserId;
-import com.teamdev.chat.service.impl.exception.AuthenticationException;
-import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
-import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,4 +20,6 @@ public interface MessageService {
             throws AuthenticationException, UserNotFoundException;
 
     ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, Date date);
+
+    ArrayList<MessageDTO> findMessagesByChatRoomIdAfterDate(Token token, UserId userId, ChatRoomId chatRoomId, Date date);
 }
