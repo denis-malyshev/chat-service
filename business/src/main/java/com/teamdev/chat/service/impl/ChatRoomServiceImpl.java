@@ -75,7 +75,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User user = getUser(userId);
         ChatRoom chatRoom = getChatRoom(chatRoomId);
 
-        boolean removeChat = chatRoom.getUsers().remove(user);
+        boolean removeChat = user.getChatRooms().remove(chatRoom);
 
         if (removeChat) {
             LOG.info(format("User[%d] was successfully deleted from chat-room[%d].", userId.id, chatRoomId.id));

@@ -57,7 +57,7 @@ public class MessageServiceImpl implements MessageService {
         chatRoomRepository.save(chatRoom);
 
         LOG.info("Message sent successfully.");
-        return new MessageDTO(message.getId(), message.getText(), message.getCreatingTime());
+        return new MessageDTO(message.getId(), message.getSender().getFirstName(), message.getText(), message.getCreatingTime());
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MessageServiceImpl implements MessageService {
         userRepository.save(receiver);
 
         LOG.info("Message sent successfully.");
-        return new MessageDTO(message.getId(), message.getText(), message.getCreatingTime());
+        return new MessageDTO(message.getId(), message.getSender().getFirstName(), message.getText(), message.getCreatingTime());
     }
 
     @Override
@@ -87,6 +87,7 @@ public class MessageServiceImpl implements MessageService {
         return messages.stream().map(message ->
                 new MessageDTO(
                         message.getId(),
+                        message.getSender().getFirstName(),
                         message.getText(),
                         message.getCreatingTime())).
                 collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
@@ -95,10 +96,13 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public ArrayList<MessageDTO> findMessagesByChatRoomIdAfterDate(
             Token token, UserId userId, ChatRoomId chatRoomId, Date date) {
+        LOG.info("Try to read messages by chat-room id after date");
+
         List<Message> messages = messageRepository.findMessagesByChatRoomIdAfterDate(chatRoomId.id, date);
         return messages.stream().map(message ->
                 new MessageDTO(
                         message.getId(),
+                        message.getSender().getFirstName(),
                         message.getText(),
                         message.getCreatingTime())).
                 collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
