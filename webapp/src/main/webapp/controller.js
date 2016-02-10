@@ -94,10 +94,15 @@ function Controller(eventbus, user) {
         readAllChats();
     });
 
+    var alreadyJoinedChats = [];
     var joinToChat = function (chatRoomId) {
         var updateChatRequest = new UpdateChatRequest(new Token(token), new UserId(id), new ChatRoomId(chatRoomId));
         var data = JSON.stringify(updateChatRequest);
         console.log(data);
+
+        if ($.inArray(chatRoomId, alreadyJoinedChats) == -1) {
+            registerChat(eventBus, chatRoomId);
+        }
 
         $.ajax({
             type: "PUT",
@@ -107,6 +112,7 @@ function Controller(eventbus, user) {
             dataType: "json"
         }).always(function (data) {
             eventBus.postMessage("SUCCESSFUL_JOINED", chatRoomId);
+            alreadyJoinedChats.push(chatRoomId);
             console.log(data);
         });
     };
