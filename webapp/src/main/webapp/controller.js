@@ -1,6 +1,7 @@
 function Controller(eventbus, user) {
     var eventBus = eventbus;
     var user = user;
+    var delay = 1000 * 10;
 
     var register = function (registrationDTO) {
         var data = JSON.stringify(registrationDTO);
@@ -94,15 +95,10 @@ function Controller(eventbus, user) {
         readAllChats();
     });
 
-    var alreadyJoinedChats = [];
     var joinToChat = function (chatRoomId) {
         var updateChatRequest = new UpdateChatRequest(new Token(token), new UserId(id), new ChatRoomId(chatRoomId));
         var data = JSON.stringify(updateChatRequest);
         console.log(data);
-
-        if ($.inArray(chatRoomId, alreadyJoinedChats) == -1) {
-            registerChat(eventBus, chatRoomId);
-        }
 
         $.ajax({
             type: "PUT",
@@ -112,7 +108,6 @@ function Controller(eventbus, user) {
             dataType: "json"
         }).always(function (data) {
             eventBus.postMessage("SUCCESSFUL_JOINED", chatRoomId);
-            alreadyJoinedChats.push(chatRoomId);
             console.log(data);
         });
     };
@@ -183,7 +178,7 @@ function Controller(eventbus, user) {
     });
 
     var checkMessages = function (chatRoomId) {
-        var readMessageRequest = new ReadMessageRequest(new Token(token), new UserId(id), new Date(new Date().getTime() - 1000 * 5), new ChatRoomId(chatRoomId));
+        var readMessageRequest = new ReadMessageRequest(new Token(token), new UserId(id), new Date(new Date().getTime() - delay), new ChatRoomId(chatRoomId));
         var data = JSON.stringify(readMessageRequest);
         console.log(data);
 
@@ -200,15 +195,11 @@ function Controller(eventbus, user) {
     };
 
     eventBus.registerConsumer("CHECK_MESSAGES", function (chatRoomId) {
-        var messageChecker = function () {
-            checkMessages(chatRoomId);
-        };
-
-        setInterval(messageChecker, 1000 * 5);
+        checkMessages(chatRoomId);
     });
 
     var checkSentPrivateMessages = function (chatRoomId) {
-        var readMessageRequest = new ReadMessageRequest(new Token(token), new UserId(id), new Date(new Date().getTime() - 1000 * 5), new ChatRoomId(chatRoomId));
+        var readMessageRequest = new ReadMessageRequest(new Token(token), new UserId(id), new Date(new Date().getTime() - delay), new ChatRoomId(chatRoomId));
         var data = JSON.stringify(readMessageRequest);
         console.log(data);
 
@@ -225,15 +216,11 @@ function Controller(eventbus, user) {
     };
 
     eventBus.registerConsumer("CHECK_SENT_PRIVATE_MESSAGES", function (chatRoomId) {
-        var messageChecker = function () {
-            checkSentPrivateMessages(chatRoomId);
-        };
-
-        setInterval(messageChecker, 1000 * 5);
+        checkSentPrivateMessages(chatRoomId);
     });
 
     var checkReceivedPrivateMessages = function (chatRoomId) {
-        var readMessageRequest = new ReadMessageRequest(new Token(token), new UserId(id), new Date(new Date().getTime() - 1000 * 5), new ChatRoomId(chatRoomId));
+        var readMessageRequest = new ReadMessageRequest(new Token(token), new UserId(id), new Date(new Date().getTime() - delay), new ChatRoomId(chatRoomId));
         var data = JSON.stringify(readMessageRequest);
         console.log(data);
 
@@ -250,11 +237,7 @@ function Controller(eventbus, user) {
     };
 
     eventBus.registerConsumer("CHECK_RECEIVED_PRIVATE_MESSAGES", function (chatRoomId) {
-        var messageChecker = function () {
-            checkReceivedPrivateMessages(chatRoomId);
-        };
-
-        setInterval(messageChecker, 1000 * 5);
+        checkReceivedPrivateMessages(chatRoomId);
     });
 
     var readAllUsersInChat = function (chatRoomId) {
@@ -270,10 +253,6 @@ function Controller(eventbus, user) {
     };
 
     eventBus.registerConsumer("CHECK_USERS", function (chatRoomId) {
-        var userChecker = function () {
-            readAllUsersInChat(chatRoomId);
-        };
-
-        setInterval(userChecker, 1000 * 5);
+        readAllUsersInChat(chatRoomId);
     });
 };

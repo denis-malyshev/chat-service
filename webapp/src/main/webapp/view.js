@@ -80,11 +80,11 @@ function MainView(eventBus) {
 
         eventBus.registerConsumer("CHAT_LIST_LOADED", function (chatList) {
             showChatList(eventBus, chatList);
-        });
+        }, "LOGOUT_SUCCESSFUL");
 
         eventBus.registerConsumer("SUCCESSFUL_JOINED", function (chatRoomId) {
             showChatComp(eventBus, chatRoomId);
-        });
+        }, "LOGOUT_SUCCESSFUL");
 
         $(document).ready(function () {
             eventBus.postMessage("MAIN_VIEW_LOAD", null);
@@ -92,7 +92,7 @@ function MainView(eventBus) {
     });
 };
 
-function registerChat (eventbus, chatRoomId) {
+function registerChat(eventbus, chatRoomId) {
     var eventBus = eventbus;
 
     eventBus.registerConsumer(chatRoomId + "_MESSAGES_UPDATED", function (messages) {
@@ -100,29 +100,40 @@ function registerChat (eventbus, chatRoomId) {
             var text = messages[i].sender + ": " + messages[i].text;
             $("#correspondence").append(text + "&#13;&#10;");
         }
-    });
+    }, "SUCCESSFUL_LEAVE");
 
     eventBus.registerConsumer(chatRoomId + "_SENT_PRIVATE_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
             var text = "You to " + messages[i].receiver + ": " + messages[i].text;
             $("#correspondence").append(text + "&#13;&#10;");
         }
-    });
+    }, "SUCCESSFUL_LEAVE");
 
     eventBus.registerConsumer(chatRoomId + "_RECEIVED_PRIVATE_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
             var text = messages[i].sender + " to you: " + messages[i].text;
             $("#correspondence").append(text + "&#13;&#10;");
         }
-    });
+    }, "SUCCESSFUL_LEAVE");
 
     eventBus.registerConsumer(chatRoomId + "_USERS_UPDATED", function (userList) {
         showUserList("user-list", userList);
-    });
+    }, "SUCCESSFUL_LEAVE");
 
     eventBus.registerConsumer("SUCCESSFUL_LEAVE", function () {
         $("#currentChat").remove();
     });
+
+    eventBus.registerConsumer("CHAT_MESSAGES_UPDATE", function () {
+        var fun = function () {
+            eventBus.postMessage("CHECK_MESSAGES", chatRoomId);
+            eventBus.postMessage("CHECK_SENT_PRIVATE_MESSAGES", chatRoomId);
+            eventBus.postMessage("CHECK_RECEIVED_PRIVATE_MESSAGES", chatRoomId);
+            eventBus.postMessage("CHECK_USERS", chatRoomId);
+        };
+
+        setInterval(fun, 1000 * 10);
+    }, "SUCCESSFUL_LEAVE");
 };
 
 function showChatComp(eventbus, chatRoomId) {
@@ -139,11 +150,9 @@ function showChatComp(eventbus, chatRoomId) {
         '</br><input type="checkbox" id="private" name="isPrivate" value=true>' +
         '<label>send privately to: </label><div id="user-list"></div></div>');
 
-    eventBus.postMessage("CHECK_MESSAGES", chatRoomId);
-    eventBus.postMessage("CHECK_SENT_PRIVATE_MESSAGES", chatRoomId);
-    eventBus.postMessage("CHECK_RECEIVED_PRIVATE_MESSAGES", chatRoomId);
+    registerChat(eventBus, chatRoomId);
 
-    eventBus.postMessage("CHECK_USERS", chatRoomId);
+    eventBus.postMessage("CHAT_MESSAGES_UPDATE");
 
     document.getElementById("sendMessage").onclick = function () {
         var receiverId;
