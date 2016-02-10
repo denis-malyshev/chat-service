@@ -15,18 +15,28 @@ View.prototype.launch = function () {
 function StartView(eventbus) {
     var eventBus = eventbus;
     var divId = "start-view";
-    var innerHTML = '<div id="' + divId + '" align="center"></div>';
+    var innerHTML = '<div class = "container" id="' + divId + '"></div>';
     document.body.innerHTML = innerHTML;
 
-    $("#" + divId).html('<div><h2>Registration</h2></br>' +
-        'Name:</br><input type="text" id="firstName"></br>' +
-        'Email:</br><input type="email" id="register-email"></br>' +
-        'Password:</br><input type="password" id="register-pwd"></br>' +
-        '<button id="registerBtn">Register</button></br>' +
+    $("#" + divId).html(
+        '<div class = "container">' +
+        '<h2>Registration</h2>' +
+        '<div class="col-md-2">' +
+        '<label>First Name</label>' +
+        '<input type="text" class = "form-control" placeholder = "Enter First Name" id="firstName">' +
+        '<label>Email</label>' +
+        '<input type="email" class = "form-control" placeholder = "Enter Email" id="register-email">' +
+        '<label>Password</label>' +
+        '<input type="password" class = "form-control" placeholder = "Enter Password" id="register-pwd">' +
+        '</br><button id="registerBtn" class = "btn btn-primary">Register</button></div></div>' +
+        '<div class = "container">' +
         '<h2>Login</h2>' +
-        'Email:</br><input type="email" id="login-email"></br>' +
-        'Password:</br><input type="password" id="login-pwd"></br>' +
-        '<button id="loginBtn">Login</button>'
+        '<div class="col-md-2">' +
+        '<label>Email</label>' +
+        '<input type="email" class = "form-control" placeholder = "Enter Email" id="login-email">' +
+        '<label>Password</label>' +
+        '<input type="password" class = "form-control" placeholder = "Enter Password" id="login-pwd">' +
+        '</br><button id="loginBtn" class = "btn btn-primary">Login</button></div></div>'
     );
 
     $(document).ready(function () {
@@ -46,12 +56,18 @@ function StartView(eventbus) {
 
 function MainView(eventBus) {
     var eventBus = eventBus;
-    var innerHTML = '<div id="main-view"></div>';
+    var innerHTML = '<div id="main-view" class = "container"></div>';
     document.body.innerHTML = innerHTML;
 
-    $("#main-view").html('<div align="right"><button id="logoutBtn">Logout</button></div>' +
-        '</br><div align="left">Create chat:</br><input type="text" id="chat-name"></br>' +
-        '<button id="create-chat">Create</button></div>');
+    $("#main-view").html(
+        '<div align="right"><button id="logoutBtn" class = "btn btn-primary btn-xs">Logout</button></div>' +
+        '</br><div class="container"></div>' +
+        '<div align="left" class="form-group">' +
+        '<div align="right" class="container">' +
+        '<div class="col-md-2">' +
+        '<label>Chat-name</label>' +
+        '<input type="text" id="chat-name" class = "form-control">' +
+        '</br><button id="create-chat" class = "btn btn-primary btn-xs">Create</button></div></div></div>');
 
     $(document).ready(function () {
         document.getElementById("logoutBtn").onclick = function () {
@@ -76,19 +92,8 @@ function MainView(eventBus) {
     });
 };
 
-function showChatComp(eventbus, chatRoomId) {
+function registerChat (eventbus, chatRoomId) {
     var eventBus = eventbus;
-    var innerHTML = '<div id="currentChat"></div>';
-    $('body').append(innerHTML);
-
-    $("#currentChat").html('<div align="center">Current chat:</br><textarea readonly id="correspondence" rows="10" cols="50"></textarea></br> ' +
-        '<input type="text" id="messageArea" align="left">' +
-        '<button id="sendMessage">Send</button></br>' +
-        '<input type="checkbox" id="private" name="isPrivate" value=true>send privately to: <div id="user-list"></div></div>');
-
-    eventBus.postMessage("CHECK_MESSAGES", chatRoomId);
-    eventBus.postMessage("CHECK_SENT_PRIVATE_MESSAGES", chatRoomId);
-    eventBus.postMessage("CHECK_RECEIVED_PRIVATE_MESSAGES", chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
@@ -111,15 +116,34 @@ function showChatComp(eventbus, chatRoomId) {
         }
     });
 
-    eventBus.registerConsumer("SUCCESSFUL_LEAVE", function () {
-        $("#currentChat").remove();
-    });
-
-    eventBus.postMessage("CHECK_USERS", chatRoomId);
-
     eventBus.registerConsumer(chatRoomId + "_USERS_UPDATED", function (userList) {
         showUserList("user-list", userList);
     });
+
+    eventBus.registerConsumer("SUCCESSFUL_LEAVE", function () {
+        $("#currentChat").remove();
+    });
+};
+
+function showChatComp(eventbus, chatRoomId) {
+    var eventBus = eventbus;
+    var innerHTML = '<div id="currentChat"></div>';
+    $("#main-view").append(innerHTML);
+
+    $("#currentChat").html(
+        '<div align="center">' +
+        '<label>Current chat</label>' +
+        '</br><textarea readonly id="correspondence" rows="10" cols="50"></textarea> ' +
+        '</br><input type="text" id="messageArea" align="left">' +
+        '<button id="sendMessage" class = "btn btn-primary btn-xs">Send</button>' +
+        '</br><input type="checkbox" id="private" name="isPrivate" value=true>' +
+        '<label>send privately to: </label><div id="user-list"></div></div>');
+
+    eventBus.postMessage("CHECK_MESSAGES", chatRoomId);
+    eventBus.postMessage("CHECK_SENT_PRIVATE_MESSAGES", chatRoomId);
+    eventBus.postMessage("CHECK_RECEIVED_PRIVATE_MESSAGES", chatRoomId);
+
+    eventBus.postMessage("CHECK_USERS", chatRoomId);
 
     document.getElementById("sendMessage").onclick = function () {
         var receiverId;
@@ -154,8 +178,8 @@ function showUserList(divId, userList) {
 
 function showChatList(eventBus, chatList) {
     var eventBus = eventBus;
-    var innerHTML = '<div id="chat-list"></div>';
-    $('body').append(innerHTML);
+    var innerHTML = '<div id="chat-list" class="container"></div>';
+    $("#main-view").append(innerHTML);
 
     var listBox = '<select id="selectChat">';
 
@@ -164,8 +188,10 @@ function showChatList(eventBus, chatList) {
     }
     listBox += '</select>';
 
-    $("#chat-list").html('Chat-rooms:</br>' + listBox +
-        '<button id="join">Join</button><button id="leave">Leave</button>');
+    $("#chat-list").html(
+        '<label>Chat-rooms:</label>' + listBox +
+        '<button id="join" class = "btn btn-success btn-xs">Join</button>' +
+        '<button id="leave" class = "btn btn-danger btn-xs">Leave</button>');
 
     document.getElementById("join").onclick = function () {
         eventBus.postMessage("JOIN_TO_CHAT_ATTEMPT", $("#selectChat").val());
