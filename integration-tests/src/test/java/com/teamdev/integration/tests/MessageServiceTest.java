@@ -75,6 +75,7 @@ public class MessageServiceTest {
         try {
             String text = "Hello!";
             CloseableHttpResponse response = sendMessage(testToken, testUserId, testChatRoomId.id, text, false);
+            LOG.info(response);
             String json = contentToString(response);
             MessageDTO messageDTO = fromJson(json, MessageDTO.class);
             assertEquals("Message texts must be equals.", text, messageDTO.text);

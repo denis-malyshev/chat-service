@@ -1,6 +1,5 @@
 package com.teamdev.chat.service.impl;
 
-import com.teamdev.chat.persistence.MessageRepository;
 import com.teamdev.chat.persistence.UserRepository;
 import com.teamdev.chat.persistence.dom.ChatRoom;
 import com.teamdev.chat.persistence.dom.Message;
@@ -35,8 +34,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private MessageRepository messageRepository;
 
     public UserServiceImpl() {
     }
