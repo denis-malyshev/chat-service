@@ -88,7 +88,7 @@ public class MessageServiceImpl implements MessageService {
                 new MessageDTO(
                         message.getId(),
                         message.getSender().getFirstName(),
-                        message.getReceiver().getFirstName(),
+                        "chat-room",
                         message.getText(),
                         message.getCreatingTime())).
                 collect(Collectors.toCollection(ArrayList<MessageDTO>::new));

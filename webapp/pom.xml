@@ -58,7 +58,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <warName>chatRoom-service</warName>
+                    <warName>chat-service</warName>
                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
