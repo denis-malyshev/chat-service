@@ -5,12 +5,14 @@ import java.util.Date;
 public class MessageDTO {
     public final long id;
     public final String sender;
+    public final String receiver;
     public final String text;
     public final Date time;
 
-    public MessageDTO(long id, String sender, String text, Date time) {
+    public MessageDTO(long id, String sender, String receiver, String text, Date time) {
         this.id = id;
         this.sender = sender;
+        this.receiver = receiver;
         this.text = text;
         this.time = time;
     }

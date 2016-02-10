@@ -22,4 +22,8 @@ public interface MessageService {
     ArrayList<MessageDTO> findAllAfterDate(Token token, UserId userId, Date date);
 
     ArrayList<MessageDTO> findMessagesByChatRoomIdAfterDate(Token token, UserId userId, ChatRoomId chatRoomId, Date date);
+
+    ArrayList<MessageDTO> findPrivateMessagesByReceiverIdAfterDate(Token token, UserId userId, Date date);
+
+    ArrayList<MessageDTO> findPrivateMessagesBySenderIdAfterDate(Token token, UserId userId, Date date);
 }

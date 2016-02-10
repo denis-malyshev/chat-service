@@ -4,10 +4,7 @@ import com.teamdev.chat.service.UserService;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
-import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
-import com.teamdev.chatservice.wrappers.dto.Token;
-import com.teamdev.chatservice.wrappers.dto.UserDTO;
-import com.teamdev.chatservice.wrappers.dto.UserId;
+import com.teamdev.chatservice.wrappers.dto.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,6 +49,15 @@ public final class UserServiceController {
             LOG.error(e.getMessage(), e);
             throw e;
         }
+    }
+
+    @RequestMapping(value = "/find_by_chat/{id}", params = {"token", "userId"}, method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Collection<UserDTO>> findByChatRoomId(@RequestParam String token, @RequestParam long userId, @PathVariable long id) {
+        return new ResponseEntity<>(userService.findUsersByChatRoomId(
+                new Token(token, userId),
+                new UserId(userId),
+                new ChatRoomId(id)), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/chats", params = {"token", "userId"}, method = RequestMethod.GET)

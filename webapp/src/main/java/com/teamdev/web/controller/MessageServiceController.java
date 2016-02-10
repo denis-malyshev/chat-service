@@ -74,6 +74,34 @@ public class MessageServiceController {
         }
     }
 
+    @RequestMapping(value = "/find_all_received_private", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<ArrayList<MessageDTO>> findAllReceivedPrivateAfterDate(@RequestBody ReadMessagesRequest readMessagesRequest) {
+        try {
+            return new ResponseEntity<>(messageService.findPrivateMessagesByReceiverIdAfterDate(
+                    readMessagesRequest.token,
+                    readMessagesRequest.userId,
+                    readMessagesRequest.date), HttpStatus.OK);
+        } catch (AuthenticationException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @RequestMapping(value = "/find_all_sent_private", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<ArrayList<MessageDTO>> findAllSentPrivateAfterDate(@RequestBody ReadMessagesRequest readMessagesRequest) {
+        try {
+            return new ResponseEntity<>(messageService.findPrivateMessagesBySenderIdAfterDate(
+                    readMessagesRequest.token,
+                    readMessagesRequest.userId,
+                    readMessagesRequest.date), HttpStatus.OK);
+        } catch (AuthenticationException e) {
+            LOG.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
     @RequestMapping(value = "/find_all_by_chat_after", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<ArrayList<MessageDTO>> findAllByChatRoomIdAfterDate(@RequestBody ReadMessagesRequest readMessagesRequest) {

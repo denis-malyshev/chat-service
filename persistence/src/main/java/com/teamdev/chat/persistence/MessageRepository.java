@@ -19,4 +19,12 @@ public interface MessageRepository extends CrudRepository<Message, Long> {
     @Query(value = "select * from message where chatRoom_id = :id and creatingTime > :date",
             nativeQuery = true)
     List<Message> findMessagesByChatRoomIdAfterDate(@Param("id") long chatRoomId, @Param("date") Date date);
+
+    @Query(value = "select * from message where receiver_id = :id and creatingTime > :date",
+            nativeQuery = true)
+    List<Message> findMessageByReceiverIdAfterDate(@Param("id") long userId, @Param("date") Date date);
+
+    @Query(value = "select * from message where sender_id = :id and creatingTime > :date",
+            nativeQuery = true)
+    List<Message> findMessageBySenderIdAfterDate(@Param("id") long userId, @Param("date") Date date);
 }

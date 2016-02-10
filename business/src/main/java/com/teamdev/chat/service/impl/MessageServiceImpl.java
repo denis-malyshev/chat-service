@@ -57,7 +57,7 @@ public class MessageServiceImpl implements MessageService {
         chatRoomRepository.save(chatRoom);
 
         LOG.info("Message sent successfully.");
-        return new MessageDTO(message.getId(), message.getSender().getFirstName(), message.getText(), message.getCreatingTime());
+        return new MessageDTO(message.getId(), message.getSender().getFirstName(), "chat-room" + chatRoomId.id, message.getText(), message.getCreatingTime());
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MessageServiceImpl implements MessageService {
         userRepository.save(receiver);
 
         LOG.info("Message sent successfully.");
-        return new MessageDTO(message.getId(), message.getSender().getFirstName(), message.getText(), message.getCreatingTime());
+        return new MessageDTO(message.getId(), message.getSender().getFirstName(), message.getReceiver().getFirstName(), message.getText(), message.getCreatingTime());
     }
 
     @Override
@@ -88,6 +88,40 @@ public class MessageServiceImpl implements MessageService {
                 new MessageDTO(
                         message.getId(),
                         message.getSender().getFirstName(),
+                        message.getReceiver().getFirstName(),
+                        message.getText(),
+                        message.getCreatingTime())).
+                collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
+    }
+
+    @Override
+    public ArrayList<MessageDTO> findPrivateMessagesByReceiverIdAfterDate(
+            Token token, UserId userId, Date date) {
+        LOG.info("Try to read private-messages by receiverId after date");
+
+        List<Message> messages = messageRepository.findMessageByReceiverIdAfterDate(userId.id, date);
+        return messages.stream().map(message ->
+                new MessageDTO(
+                        message.getId(),
+                        message.getSender().getFirstName(),
+                        message.getReceiver().getFirstName(),
+                        message.getText(),
+                        message.getCreatingTime())).
+                collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
+    }
+
+    @Override
+    public ArrayList<MessageDTO> findPrivateMessagesBySenderIdAfterDate(
+            Token token, UserId userId, Date date) {
+
+        LOG.info("Try to read private-messages by senderId after date");
+
+        List<Message> messages = messageRepository.findMessageBySenderIdAfterDate(userId.id, date);
+        return messages.stream().map(message ->
+                new MessageDTO(
+                        message.getId(),
+                        message.getSender().getFirstName(),
+                        message.getReceiver().getFirstName(),
                         message.getText(),
                         message.getCreatingTime())).
                 collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
@@ -99,13 +133,17 @@ public class MessageServiceImpl implements MessageService {
         LOG.info("Try to read messages by chat-room id after date");
 
         List<Message> messages = messageRepository.findMessagesByChatRoomIdAfterDate(chatRoomId.id, date);
-        return messages.stream().map(message ->
+        ArrayList<MessageDTO> collect = messages.stream().map(message ->
                 new MessageDTO(
                         message.getId(),
                         message.getSender().getFirstName(),
+                        "chat-room" + chatRoomId.id,
                         message.getText(),
                         message.getCreatingTime())).
                 collect(Collectors.toCollection(ArrayList<MessageDTO>::new));
+
+        LOG.info("successful");
+        return collect;
     }
 
     private ChatRoom getChatRoom(ChatRoomId chatRoomId) throws ChatRoomNotFoundException {
