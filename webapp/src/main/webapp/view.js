@@ -111,6 +111,10 @@ function showChatComp(eventbus, chatRoomId) {
         }
     });
 
+    eventBus.registerConsumer("SUCCESSFUL_LEAVE", function () {
+        $("#currentChat").remove();
+    });
+
     eventBus.postMessage("CHECK_USERS", chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_USERS_UPDATED", function (userList) {

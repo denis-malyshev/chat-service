@@ -127,7 +127,8 @@ function Controller(eventbus, user) {
             contentType: "application/json",
             dataType: "json",
         }).always(function (data) {
-            console.log(data);
+            eventBus.postMessage("SUCCESSFUL_LEAVE");
+            console.log("SUCCESS");
         });
     };
 
