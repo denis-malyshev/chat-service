@@ -36,6 +36,7 @@ public class UserServiceTest {
     private static final String REGISTER_URL = USER_SERVICE_URL + "/register";
     private static final String FIND_CHATS_URL = USER_SERVICE_URL + "/chats";
     private static final String DELETE_USER_URL = USER_SERVICE_URL + "/delete";
+    private static final String FIND_BY_CHAT = USER_SERVICE_URL + "/find_by_chat";
     private static final Random RANDOM = new Random();
     private UserDTO testUserDTO;
     private ChatRoomId testChatRoomId;

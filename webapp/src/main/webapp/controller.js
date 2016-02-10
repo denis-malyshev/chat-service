@@ -83,8 +83,6 @@ function Controller(eventbus, user) {
             url: "http://localhost:8080/chat-service/chat/chats/all?token=" + token + '&userId=' + id
         }).done(function (data) {
             eventBus.postMessage("CHAT_LIST_LOADED", data);
-        }).always(function () {
-            console.log("FAIL");
         });
     };
 
@@ -110,8 +108,6 @@ function Controller(eventbus, user) {
         }).always(function (data) {
             eventBus.postMessage("SUCCESSFUL_JOINED", chatRoomId);
             console.log(data);
-        }).fail(function () {
-            console.log("fail");
         });
     };
 
@@ -132,8 +128,6 @@ function Controller(eventbus, user) {
             dataType: "json",
         }).always(function (data) {
             console.log(data);
-        }).fail(function () {
-            console.log("fail");
         });
     };
 
