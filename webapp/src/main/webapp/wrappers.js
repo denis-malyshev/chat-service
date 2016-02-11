@@ -20,6 +20,11 @@ function MessageDTO(id, sender, text, time) {
     this.time = time;
 };
 
+function ChatRoomDTO(id, name) {
+    this.id = id;
+    this.name = name;
+};
+
 function ChatRoomId(chatRoomId) {
     this.id = chatRoomId;
 };

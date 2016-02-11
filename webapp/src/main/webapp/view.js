@@ -12,7 +12,7 @@ View.prototype.launch = function () {
     StartView(this.eventBus);
 };
 
-function StartView(eventbus) {
+var StartView = function (eventbus) {
     var eventBus = eventbus;
     var divId = "start-view";
     var innerHTML = '<div class = "container" id="' + divId + '"></div>';
@@ -54,7 +54,7 @@ function StartView(eventbus) {
     });
 };
 
-function MainView(eventBus) {
+var MainView = function (eventBus) {
     var eventBus = eventBus;
     var innerHTML = '<div id="main-view" class = "container"></div>';
     document.body.innerHTML = innerHTML;
@@ -82,17 +82,15 @@ function MainView(eventBus) {
             showChatList(eventBus, chatList);
         }, "LOGOUT_SUCCESSFUL");
 
-        eventBus.registerConsumer("SUCCESSFUL_JOINED", function (chatRoomId) {
-            showChatComp(eventBus, chatRoomId);
+        eventBus.registerConsumer("SUCCESSFUL_JOINED", function (chatRoomDTO) {
+            showChatComp(eventBus, chatRoomDTO);
         }, "LOGOUT_SUCCESSFUL");
 
-        $(document).ready(function () {
-            eventBus.postMessage("MAIN_VIEW_LOAD", null);
-        });
+        eventBus.postMessage("MAIN_VIEW_LOAD", null);
     });
 };
 
-function registerChat(eventbus, chatRoomId) {
+var registerChat = function (eventbus, chatRoomId) {
     var eventBus = eventbus;
 
     eventBus.registerConsumer(chatRoomId + "_MESSAGES_UPDATED", function (messages) {
@@ -136,54 +134,55 @@ function registerChat(eventbus, chatRoomId) {
     }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     eventBus.registerConsumer("SUCCESSFUL_LEAVE_FROM_" + chatRoomId, function () {
-        $("#currentChat").remove();
+        $("#currentChat_" + chatRoomId).remove();
+        $("#link_on_chat_" + chatRoomId).remove();
         clearInterval(intervalId);
     }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 };
 
-function showChatComp(eventbus, chatRoomId) {
+var showChatComp = function (eventbus, chatRoomDTO) {
     var eventBus = eventbus;
-    var innerHTML = '<li>' +
-        '<a href="#currentChat_' + chatRoomId + '" data-toggle = "tab">chat</a>' +
-        '</li>' +
-        '<div class = "tab-pane fade" id="currentChat_' + chatRoomId + '"></div>';
-    $("#myTabContent").append(innerHTML);
 
-    $("#currentChat_" + chatRoomId).html(
+    $("#myTab").append('<li class = "dropdown" id="link_on_chat_' + chatRoomDTO.id + '">' +
+        '<a href="#currentChat_' + chatRoomDTO.id + '" data-toggle = "tab">' + chatRoomDTO.name + '</a>' +
+        '</li>');
+    $("#myTabContent").append('<div class = "tab-pane fade" id="currentChat_' + chatRoomDTO.id + '"></div>');
+
+    $("#currentChat_" + chatRoomDTO.id).html(
         '<div align="center">' +
-        '<label>Current chat</label>' +
-        '</br><textarea readonly id="correspondence_' + chatRoomId + '" rows="10" cols="50"></textarea> ' +
-        '</br><input type="text" id="messageArea_' + chatRoomId + '" align="left">' +
-        '<button id="sendMessage_' + chatRoomId + '" class = "btn btn-primary btn-xs">Send</button>' +
-        '</br><input type="checkbox" id="private_' + chatRoomId + '" name="isPrivate" value=true>' +
-        '<label>send privately to: </label><div id="user-list_' + chatRoomId + '"></div></div>');
+        '<label>' + chatRoomDTO.name + '</label>' +
+        '</br><textarea readonly id="correspondence_' + chatRoomDTO.id + '" rows="10" cols="50"></textarea>' +
+        '</br><input type="text" id="messageArea_' + chatRoomDTO.id + '" align="left">' +
+        '<button id="sendMessage_' + chatRoomDTO.id + '" class = "btn btn-primary btn-xs">Send</button>' +
+        '</br><input type="checkbox" id="private_' + chatRoomDTO.id + '" name="isPrivate" value=true>' +
+        '<label>send privately to: </label><div id="user-list_' + chatRoomDTO.id + '"></div></div>');
 
-    registerChat(eventBus, chatRoomId);
+    registerChat(eventBus, chatRoomDTO.id);
 
-    eventBus.postMessage("CHAT_MESSAGES_UPDATE" + chatRoomId);
+    eventBus.postMessage("CHAT_MESSAGES_UPDATE" + chatRoomDTO.id);
 
-    $("#sendMessage_" + chatRoomId).click(function () {
+    $("#sendMessage_" + chatRoomDTO.id).click(function () {
         var receiverId;
         var type;
         var PRIVATE_MESSAGE = "SEND_PRIVATE_MESSAGE_ATTEMPT";
         var MESSAGE = "SEND_MESSAGE_ATTEMPT";
 
-        if (document.getElementById("private_" + chatRoomId).checked) {
-            receiverId = $("#selectUser_" + chatRoomId).val();
+        if (document.getElementById("private_" + chatRoomDTO.id).checked) {
+            receiverId = $("#selectUser_" + chatRoomDTO.id).val();
             console.log("RECEIVER:" + receiverId);
             type = PRIVATE_MESSAGE;
         } else {
-            receiverId = chatRoomId;
+            receiverId = chatRoomDTO.id;
             type = MESSAGE;
         }
 
-        var messageData = new MessageData(receiverId, $("#messageArea_" + chatRoomId).val());
+        var messageData = new MessageData(receiverId, $("#messageArea_" + chatRoomDTO.id).val());
         eventBus.postMessage(type, messageData);
-        $("#messageArea_" + chatRoomId).val("");
+        $("#messageArea_" + chatRoomDTO.id).val("");
     });
 };
 
-function showUserList(divId, userList, chatRoomId) {
+var showUserList = function (divId, userList, chatRoomId) {
     var listBox = '<select id="selectUser_' + chatRoomId + '">';
 
     for (var i = 0; i < Object.keys(userList).length; i++) {
@@ -194,7 +193,7 @@ function showUserList(divId, userList, chatRoomId) {
     $("#" + divId).html(listBox);
 };
 
-function showChatList(eventBus, chatList) {
+var showChatList = function (eventBus, chatList) {
     var eventBus = eventBus;
     var innerHTML = '<div id="chat-list" class="container"></div>';
     if (!document.getElementById("chat-list")) {
@@ -219,7 +218,8 @@ function showChatList(eventBus, chatList) {
         '<button id="leave" class = "btn btn-danger btn-xs">Leave</button>');
 
     document.getElementById("join").onclick = function () {
-        eventBus.postMessage("JOIN_TO_CHAT_ATTEMPT", $("#selectChat").val());
+        eventBus.postMessage("JOIN_TO_CHAT_ATTEMPT",
+            new ChatRoomDTO($("#selectChat").val(), $("#selectChat").find('option:selected').text()));
     };
     document.getElementById("leave").onclick = function () {
         eventBus.postMessage("LEAVE_FROM_CHAT_ATTEMPT", $("#selectChat").val());
