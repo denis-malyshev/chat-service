@@ -1,7 +1,7 @@
 function Controller(eventbus, user) {
     var eventBus = eventbus;
     var user = user;
-    var delay = 1000 * 10;
+    var delay = 1000 * 2;
 
     var register = function (registrationDTO) {
         var data = JSON.stringify(registrationDTO);
