@@ -1,11 +1,10 @@
 package com.teamdev.chat.service;
 
-import com.teamdev.chatservice.wrappers.dto.*;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.RegistrationException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
+import com.teamdev.chatservice.wrappers.dto.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public interface UserService {
