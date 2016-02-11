@@ -95,8 +95,8 @@ function Controller(eventbus, user) {
         readAllChats();
     });
 
-    var joinToChat = function (chatRoomId) {
-        var updateChatRequest = new UpdateChatRequest(new Token(token), new UserId(id), new ChatRoomId(chatRoomId));
+    var joinToChat = function (chatRoomDTO) {
+        var updateChatRequest = new UpdateChatRequest(new Token(token), new UserId(id), new ChatRoomId(chatRoomDTO.id));
         var data = JSON.stringify(updateChatRequest);
         console.log(data);
 
@@ -107,13 +107,13 @@ function Controller(eventbus, user) {
             contentType: "application/json",
             dataType: "json"
         }).always(function (data) {
-            eventBus.postMessage("SUCCESSFUL_JOINED", chatRoomId);
+            eventBus.postMessage("SUCCESSFUL_JOINED", chatRoomDTO);
             console.log(data);
         });
     };
 
-    eventBus.registerConsumer("JOIN_TO_CHAT_ATTEMPT", function (chatRoomId) {
-        joinToChat(chatRoomId);
+    eventBus.registerConsumer("JOIN_TO_CHAT_ATTEMPT", function (chatRoomDTO) {
+        joinToChat(chatRoomDTO);
     });
 
     var leaveChat = function (chatRoomId) {
