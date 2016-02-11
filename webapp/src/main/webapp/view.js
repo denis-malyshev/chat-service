@@ -120,19 +120,24 @@ function registerChat(eventbus, chatRoomId) {
         showUserList("user-list", userList);
     }, "SUCCESSFUL_LEAVE");
 
-    eventBus.registerConsumer("SUCCESSFUL_LEAVE", function () {
-        $("#currentChat").remove();
-    });
+    var update = function () {
+        eventBus.postMessage("CHECK_MESSAGES", chatRoomId);
+        eventBus.postMessage("CHECK_SENT_PRIVATE_MESSAGES", chatRoomId);
+        eventBus.postMessage("CHECK_RECEIVED_PRIVATE_MESSAGES", chatRoomId);
+        eventBus.postMessage("CHECK_USERS", chatRoomId);
+    };
+
+    var delay = 1000 * 2;
+
+    var intervalId =  setInterval(update, delay);
 
     eventBus.registerConsumer("CHAT_MESSAGES_UPDATE", function () {
-        var fun = function () {
-            eventBus.postMessage("CHECK_MESSAGES", chatRoomId);
-            eventBus.postMessage("CHECK_SENT_PRIVATE_MESSAGES", chatRoomId);
-            eventBus.postMessage("CHECK_RECEIVED_PRIVATE_MESSAGES", chatRoomId);
-            eventBus.postMessage("CHECK_USERS", chatRoomId);
-        };
+        intervalId
+    }, "SUCCESSFUL_LEAVE");
 
-        setInterval(fun, 1000 * 10);
+    eventBus.registerConsumer("SUCCESSFUL_LEAVE", function () {
+        $("#currentChat").remove();
+        clearInterval(intervalId);
     }, "SUCCESSFUL_LEAVE");
 };
 

@@ -1,7 +1,7 @@
 function Controller(eventbus, user) {
     var eventBus = eventbus;
     var user = user;
-    var delay = 1000 * 10;
+    var delay = 1000 * 2;
 
     var register = function (registrationDTO) {
         var data = JSON.stringify(registrationDTO);
@@ -129,7 +129,7 @@ function Controller(eventbus, user) {
             dataType: "json",
         }).always(function (data) {
             eventBus.postMessage("SUCCESSFUL_LEAVE");
-            console.log("SUCCESS");
+            console.log(data);
         });
     };
 
