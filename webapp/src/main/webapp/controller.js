@@ -128,7 +128,7 @@ function Controller(eventbus, user) {
             contentType: "application/json",
             dataType: "json",
         }).always(function (data) {
-            eventBus.postMessage("SUCCESSFUL_LEAVE");
+            eventBus.postMessage("SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
             console.log(data);
         });
     };

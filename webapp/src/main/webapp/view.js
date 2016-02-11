@@ -100,25 +100,25 @@ function registerChat(eventbus, chatRoomId) {
             var text = messages[i].sender + ": " + messages[i].text;
             $("#correspondence").append(text + "&#13;&#10;");
         }
-    }, "SUCCESSFUL_LEAVE");
+    }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_SENT_PRIVATE_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
             var text = "You to " + messages[i].receiver + ": " + messages[i].text;
             $("#correspondence").append(text + "&#13;&#10;");
         }
-    }, "SUCCESSFUL_LEAVE");
+    }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_RECEIVED_PRIVATE_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
             var text = messages[i].sender + " to you: " + messages[i].text;
             $("#correspondence").append(text + "&#13;&#10;");
         }
-    }, "SUCCESSFUL_LEAVE");
+    }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_USERS_UPDATED", function (userList) {
         showUserList("user-list", userList);
-    }, "SUCCESSFUL_LEAVE");
+    }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     var update = function () {
         eventBus.postMessage("CHECK_MESSAGES", chatRoomId);
@@ -129,16 +129,16 @@ function registerChat(eventbus, chatRoomId) {
 
     var delay = 1000 * 2;
 
-    var intervalId =  setInterval(update, delay);
+    var intervalId = setInterval(update, delay);
 
-    eventBus.registerConsumer("CHAT_MESSAGES_UPDATE", function () {
+    eventBus.registerConsumer("CHAT_MESSAGES_UPDATE" + chatRoomId, function () {
         intervalId
-    }, "SUCCESSFUL_LEAVE");
+    }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
-    eventBus.registerConsumer("SUCCESSFUL_LEAVE", function () {
+    eventBus.registerConsumer("SUCCESSFUL_LEAVE_FROM_" + chatRoomId, function () {
         $("#currentChat").remove();
         clearInterval(intervalId);
-    }, "SUCCESSFUL_LEAVE");
+    }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 };
 
 function showChatComp(eventbus, chatRoomId) {
@@ -157,7 +157,7 @@ function showChatComp(eventbus, chatRoomId) {
 
     registerChat(eventBus, chatRoomId);
 
-    eventBus.postMessage("CHAT_MESSAGES_UPDATE");
+    eventBus.postMessage("CHAT_MESSAGES_UPDATE" + chatRoomId);
 
     document.getElementById("sendMessage").onclick = function () {
         var receiverId;
