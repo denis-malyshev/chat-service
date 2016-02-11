@@ -98,26 +98,26 @@ function registerChat(eventbus, chatRoomId) {
     eventBus.registerConsumer(chatRoomId + "_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
             var text = messages[i].sender + ": " + messages[i].text;
-            $("#correspondence").append(text + "&#13;&#10;");
+            $("#correspondence_" + chatRoomId).append(text + "&#13;&#10;");
         }
     }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_SENT_PRIVATE_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
             var text = "You to " + messages[i].receiver + ": " + messages[i].text;
-            $("#correspondence").append(text + "&#13;&#10;");
+            $("#correspondence_" + chatRoomId).append(text + "&#13;&#10;");
         }
     }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_RECEIVED_PRIVATE_MESSAGES_UPDATED", function (messages) {
         for (var i = 0; i < Object.keys(messages).length; i++) {
             var text = messages[i].sender + " to you: " + messages[i].text;
-            $("#correspondence").append(text + "&#13;&#10;");
+            $("#correspondence_" + chatRoomId).append(text + "&#13;&#10;");
         }
     }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     eventBus.registerConsumer(chatRoomId + "_USERS_UPDATED", function (userList) {
-        showUserList("user-list", userList);
+        showUserList("user-list_" + chatRoomId, userList, chatRoomId);
     }, "SUCCESSFUL_LEAVE_FROM_" + chatRoomId);
 
     var update = function () {
@@ -143,44 +143,45 @@ function registerChat(eventbus, chatRoomId) {
 
 function showChatComp(eventbus, chatRoomId) {
     var eventBus = eventbus;
-    var innerHTML = '<div id="currentChat"></div>';
+    var innerHTML = '<div id="currentChat_' + chatRoomId + '"></div>';
     $("#main-view").append(innerHTML);
 
-    $("#currentChat").html(
+    $("#currentChat_" + chatRoomId).html(
         '<div align="center">' +
         '<label>Current chat</label>' +
-        '</br><textarea readonly id="correspondence" rows="10" cols="50"></textarea> ' +
-        '</br><input type="text" id="messageArea" align="left">' +
-        '<button id="sendMessage" class = "btn btn-primary btn-xs">Send</button>' +
-        '</br><input type="checkbox" id="private" name="isPrivate" value=true>' +
-        '<label>send privately to: </label><div id="user-list"></div></div>');
+        '</br><textarea readonly id="correspondence_' + chatRoomId + '" rows="10" cols="50"></textarea> ' +
+        '</br><input type="text" id="messageArea_' + chatRoomId + '" align="left">' +
+        '<button id="sendMessage_' + chatRoomId + '" class = "btn btn-primary btn-xs">Send</button>' +
+        '</br><input type="checkbox" id="private_' + chatRoomId + '" name="isPrivate" value=true>' +
+        '<label>send privately to: </label><div id="user-list_' + chatRoomId + '"></div></div>');
 
     registerChat(eventBus, chatRoomId);
 
     eventBus.postMessage("CHAT_MESSAGES_UPDATE" + chatRoomId);
 
-    document.getElementById("sendMessage").onclick = function () {
+    $("#sendMessage_" + chatRoomId).click(function () {
         var receiverId;
         var type;
         var PRIVATE_MESSAGE = "SEND_PRIVATE_MESSAGE_ATTEMPT";
         var MESSAGE = "SEND_MESSAGE_ATTEMPT";
 
-        if (document.getElementById("private").checked) {
-            receiverId = $("#selectUser").val();
+        if (document.getElementById("private_" + chatRoomId).checked) {
+            receiverId = $("#selectUser_" + chatRoomId).val();
+            console.log("RECEIVER:" + receiverId);
             type = PRIVATE_MESSAGE;
         } else {
             receiverId = chatRoomId;
             type = MESSAGE;
         }
 
-        var messageData = new MessageData(receiverId, $("#messageArea").val());
+        var messageData = new MessageData(receiverId, $("#messageArea_" + chatRoomId).val());
         eventBus.postMessage(type, messageData);
-        $("#messageArea").val("");
-    };
+        $("#messageArea_" + chatRoomId).val("");
+    });
 };
 
-function showUserList(divId, userList) {
-    var listBox = '<select id="selectUser">';
+function showUserList(divId, userList, chatRoomId) {
+    var listBox = '<select id="selectUser_' + chatRoomId + '">';
 
     for (var i = 0; i < Object.keys(userList).length; i++) {
         listBox += '<option value="' + userList[i].id + '">' + userList[i].firstName + '</option>';
