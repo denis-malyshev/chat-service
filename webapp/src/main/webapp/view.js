@@ -158,14 +158,15 @@ var showChatComp = function (eventbus, chatRoomDTO) {
     $("#myTabContent").append('<div class = "tab-pane fade" id="currentChat_' + chatRoomDTO.id + '"></div>');
 
     $("#currentChat_" + chatRoomDTO.id).html(
-        '<div align="center">' +
+        '<div align="center" class="col-md-3">' +
         '<label>' + chatRoomDTO.name + '</label>' +
         '</br><textarea readonly id="correspondence_' + chatRoomDTO.id + '" rows="10" cols="50"></textarea>' +
-        '</br><input type="text" id="messageArea_' + chatRoomDTO.id + '" align="left">' +
-        '<button id="sendMessage_' + chatRoomDTO.id + '" class = "btn btn-primary btn-xs">Send</button>' +
+        '</br><div><input type="text" class = "form-control" id="messageArea_' + chatRoomDTO.id + '" align="left">' +
+        '<span class = "input-group-btn">' +
+        '<button class = "btn btn-default" type = "button" id="sendMessage_' + chatRoomDTO.id + '">Send</button></span></div>' +
         '</br><input type="checkbox" id="private_' + chatRoomDTO.id + '" name="isPrivate" value=true>' +
         '<label>send privately to: </label><div id="user-list_' + chatRoomDTO.id + '"></div></div>');
-
+    
     registerChat(eventBus, chatRoomDTO.id);
 
     eventBus.postMessage("CHAT_MESSAGES_UPDATE" + chatRoomDTO.id);

@@ -107,10 +107,14 @@ function Controller(eventbus, user) {
             data: data,
             contentType: "application/json",
             dataType: "json"
-        }).always(function (data) {
+        }).always(function () {
             eventBus.postMessage("SUCCESSFUL_JOINED", chatRoomDTO);
-            console.log(data);
-        });
+            console.log();
+        }).fail(function ( jqXHR, textStatus, errorThrown ) {
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+        });;
     };
 
     eventBus.registerConsumer("JOIN_TO_CHAT_ATTEMPT", function (chatRoomDTO) {

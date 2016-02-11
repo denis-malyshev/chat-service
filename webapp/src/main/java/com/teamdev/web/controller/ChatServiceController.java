@@ -1,15 +1,15 @@
 package com.teamdev.web.controller;
 
 import com.teamdev.chat.service.ChatRoomService;
-import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
-import com.teamdev.chatservice.wrappers.dto.Token;
-import com.teamdev.chatservice.wrappers.dto.UserId;
 import com.teamdev.chat.service.impl.exception.AuthenticationException;
 import com.teamdev.chat.service.impl.exception.ChatRoomAlreadyExistsException;
 import com.teamdev.chat.service.impl.exception.ChatRoomNotFoundException;
 import com.teamdev.chat.service.impl.exception.UserNotFoundException;
 import com.teamdev.chatservice.wrappers.ChatRoomRequest;
 import com.teamdev.chatservice.wrappers.UpdateChatRequest;
+import com.teamdev.chatservice.wrappers.dto.ChatRoomDTO;
+import com.teamdev.chatservice.wrappers.dto.Token;
+import com.teamdev.chatservice.wrappers.dto.UserId;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +37,7 @@ public final class ChatServiceController {
 
     @RequestMapping(value = "/join", method = RequestMethod.PUT)
     @ResponseBody
-    public String joinUserToChat(@RequestBody UpdateChatRequest updateChatRequest)
+    public ResponseEntity<String> joinUserToChat(@RequestBody UpdateChatRequest updateChatRequest)
             throws UserNotFoundException, ChatRoomNotFoundException, AuthenticationException {
         try {
             chatRoomService.joinToChatRoom(
@@ -48,12 +48,12 @@ public final class ChatServiceController {
             LOG.error(e.getMessage(), e);
             throw e;
         }
-        return "User successfully joined to chat.";
+        return new ResponseEntity<>("User successfully joined to chat.", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.PUT)
     @ResponseBody
-    public String deleteUserFromChat(@RequestBody UpdateChatRequest updateChatRequest)
+    public ResponseEntity<String> deleteUserFromChat(@RequestBody UpdateChatRequest updateChatRequest)
             throws ChatRoomNotFoundException, UserNotFoundException, AuthenticationException {
         try {
             chatRoomService.leaveChatRoom(
@@ -64,7 +64,7 @@ public final class ChatServiceController {
             LOG.error(e.getMessage(), e);
             throw e;
         }
-        return "User successfully deleted from chat.";
+        return new ResponseEntity<>("User successfully deleted from chat.", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)

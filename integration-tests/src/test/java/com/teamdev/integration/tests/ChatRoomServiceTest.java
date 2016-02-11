@@ -119,7 +119,9 @@ public class ChatRoomServiceTest {
     public void test_join_user_to_chat() {
         try {
             CloseableHttpResponse response = joinUserToChat(testToken, testUserId, testChatRoomId);
+            int statusCode = response.getStatusLine().getStatusCode();
             String result = contentToString(response);
+            assertEquals(200, statusCode);
             assertEquals("Message must be correct.", "User successfully joined to chat.", result);
         } catch (IOException e) {
             fail("Unexpected exception.");
