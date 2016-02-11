@@ -143,8 +143,11 @@ function registerChat(eventbus, chatRoomId) {
 
 function showChatComp(eventbus, chatRoomId) {
     var eventBus = eventbus;
-    var innerHTML = '<div id="currentChat_' + chatRoomId + '"></div>';
-    $("#main-view").append(innerHTML);
+    var innerHTML = '<li>' +
+        '<a href="#currentChat_' + chatRoomId + '" data-toggle = "tab">chat</a>' +
+        '</li>' +
+        '<div class = "tab-pane fade" id="currentChat_' + chatRoomId + '"></div>';
+    $("#myTabContent").append(innerHTML);
 
     $("#currentChat_" + chatRoomId).html(
         '<div align="center">' +
@@ -194,7 +197,14 @@ function showUserList(divId, userList, chatRoomId) {
 function showChatList(eventBus, chatList) {
     var eventBus = eventBus;
     var innerHTML = '<div id="chat-list" class="container"></div>';
-    $("#main-view").append(innerHTML);
+    if (!document.getElementById("chat-list")) {
+        $("#main-view").append(innerHTML);
+    }
+    if (!document.getElementById("myTab")) {
+        $("#main-view").append(
+            '<ul id = "myTab" class = "nav nav-tabs"></ul>' +
+            '<div id = "myTabContent" class = "tab-content"></div>');
+    }
 
     var listBox = '<select id="selectChat">';
 
