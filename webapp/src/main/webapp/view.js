@@ -21,7 +21,7 @@ var StartView = function (eventbus) {
     $("#" + divId).html(
         '<div class = "container">' +
         '<h2>Registration</h2>' +
-        '<div class="col-md-2">' +
+        '<div class="col-md-3" id="registrationForm">' +
         '<label>First Name</label>' +
         '<input type="text" class = "form-control" placeholder = "Enter First Name" id="firstName">' +
         '<label>Email</label>' +
@@ -31,7 +31,7 @@ var StartView = function (eventbus) {
         '</br><button id="registerBtn" class = "btn btn-primary">Register</button></div></div>' +
         '<div class = "container">' +
         '<h2>Login</h2>' +
-        '<div class="col-md-2">' +
+        '<div class="col-md-3">' +
         '<label>Email</label>' +
         '<input type="email" class = "form-control" placeholder = "Enter Email" id="login-email">' +
         '<label>Password</label>' +
@@ -50,6 +50,15 @@ var StartView = function (eventbus) {
         $("#loginBtn").click(function () {
             eventBus.postMessage("LOGIN_ATTEMPT",
                 new LoginInfo($("#login-email").val(), $("#login-pwd").val()));
+        });
+
+        eventBus.registerConsumer("REGISTRATION_SUCCESSFUL", function () {
+            $("#registrationForm").append(
+                '<div id = "myAlert" class = "alert alert-success">' +
+                '<a href = "#" class = "close" data-dismiss = "alert">&times;</a>' +
+                '<strong>Success!</strong> You have successfully signed up.' +
+                '</div>'
+            );
         });
     });
 };

@@ -14,6 +14,7 @@ function Controller(eventbus, user) {
             contentType: "application/json",
             dataType: "json"
         }).done(function (data) {
+            eventBus.postMessage("REGISTRATION_SUCCESSFUL");
             console.log(data);
         });
     };
