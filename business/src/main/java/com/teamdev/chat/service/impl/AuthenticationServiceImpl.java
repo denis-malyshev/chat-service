@@ -56,7 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void validate(Token token, UserId userId) throws AuthenticationException {
-        LOG.info("Checking user token.");
+        LOG.trace("Checking user token.");
         AuthenticationToken innerToken = tokenRepository.findByTokenKey(token.key);
 
         if (innerToken.getUser() != null && innerToken.getUser().getId() != userId.id) {
@@ -68,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AuthenticationException("Token has been expired.");
         }
 
-        LOG.info("User's token is valid.");
+        LOG.trace("User's token is valid.");
     }
 
     private AuthenticationToken generateToken(User user) {
