@@ -1,4 +1,4 @@
-function View(eventBus) {
+var View = function (eventBus) {
     this.eventBus = eventBus;
 
     eventBus.registerConsumer("USER_LOGGED", function () {

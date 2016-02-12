@@ -1,4 +1,4 @@
-function User(eventBus) {
+var User = function (eventBus) {
     this.id = 0;
     this.token = null;
     this.eventBus = eventBus;

@@ -1,4 +1,4 @@
-function EventBus() {
+var EventBus = function () {
     this.consumers = [];
 
     this.unsubscribeOldConsumers = function (type) {

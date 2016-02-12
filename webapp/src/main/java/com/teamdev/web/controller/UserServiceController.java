@@ -29,7 +29,6 @@ public final class UserServiceController {
     public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO)
             throws AuthenticationException, RegistrationException {
         try {
-            LOG.info(userDTO);
             return new ResponseEntity<>(userService.register(userDTO), HttpStatus.OK);
         } catch (AuthenticationException | RegistrationException e) {
             LOG.error(e.getMessage(), e);

@@ -1,4 +1,4 @@
-function Controller(eventbus, user) {
+var Controller = function (eventbus, user) {
     var eventBus = eventbus;
     var user = user;
     var delay = 1000 * 2;

@@ -1,64 +1,64 @@
-function UserDTO(name, email, password) {
+var UserDTO = function (name, email, password) {
     this.firstName = name;
     this.email = email;
     this.password = password;
 };
 
-function LoginInfo(email, password) {
+var LoginInfo = function(email, password) {
     this.email = email;
     this.password = password;
 };
 
-function UserId(userId) {
+var UserId = function (userId) {
     this.id = userId;
 };
 
-function MessageDTO(id, sender, text, time) {
+var MessageDTO = function (id, sender, text, time) {
     this.id = id;
     this.sender = sender;
     this.text = text;
     this.time = time;
 };
 
-function ChatRoomDTO(id, name) {
+var ChatRoomDTO = function (id, name) {
     this.id = id;
     this.name = name;
 };
 
-function ChatRoomId(chatRoomId) {
+var ChatRoomId = function (chatRoomId) {
     this.id = chatRoomId;
 };
 
-function Token(token) {
+var Token = function (token) {
     this.key = token;
 };
 
-function ChatRoomRequest(token, userId, name) {
+var ChatRoomRequest = function (token, userId, name) {
     this.token = token;
     this.userId = userId;
     this.name = name;
 };
 
-function MessageRequest(token, userId, receiverId, text) {
+var MessageRequest = function (token, userId, receiverId, text) {
     this.token = token;
     this.userId = userId;
     this.receiverId = receiverId;
     this.text = text;
 };
 
-function MessageData(receiverId, text) {
+var MessageData = function (receiverId, text) {
     this.receiverId = receiverId;
     this.text = text;
 };
 
-function ReadMessageRequest(token, userId, date, chatRoomId) {
+var ReadMessageRequest = function (token, userId, date, chatRoomId) {
     this.token = token;
     this.userId = userId;
     this.date = date;
     this.chatRoomId = chatRoomId;
 };
 
-function UpdateChatRequest(token, userId, chatRoomId) {
+var UpdateChatRequest = function (token, userId, chatRoomId) {
     this.token = token;
     this.userId = userId;
     this.chatRoomId = chatRoomId;
