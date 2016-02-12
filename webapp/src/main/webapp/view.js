@@ -3,6 +3,12 @@ function View(eventBus) {
 
     eventBus.registerConsumer("USER_LOGGED", function () {
         MainView(eventBus);
+        $(function(){
+            $('a[data-toggle = "tab"]').on('shown.bs.tab', function (e) {
+                var activeTab = $(e.target).text();
+                alert(activeTab);
+            });
+        });
     });
     eventBus.registerConsumer("LOGOUT_SUCCESSFUL", function () {
         StartView(eventBus);
@@ -59,7 +65,7 @@ var StartView = function (eventbus) {
                 '<strong>Success!</strong> You have successfully signed up.' +
                 '</div>'
             );
-        });
+        }, "LOGOUT_SUCCESSFUL");
     });
 };
 
@@ -72,7 +78,7 @@ var MainView = function (eventBus) {
         '<div align="right"><button id="logoutBtn" class = "btn btn-primary btn-xs">Logout</button></div>' +
         '</br><div class="container"></div>' +
         '<div align="left" class="form-group">' +
-        '<div align="right" class="container">' +
+        '<div class="container">' +
         '<div class="col-md-2">' +
         '<label>Chat-name</label>' +
         '<input type="text" id="chat-name" class = "form-control">' +
@@ -152,21 +158,28 @@ var registerChat = function (eventbus, chatRoomId) {
 var showChatComp = function (eventbus, chatRoomDTO) {
     var eventBus = eventbus;
 
-    $("#myTab").append('<li class = "dropdown" id="link_on_chat_' + chatRoomDTO.id + '">' +
+    $("#myTab").append('<li id="link_on_chat_' + chatRoomDTO.id + '">' +
         '<a href="#currentChat_' + chatRoomDTO.id + '" data-toggle = "tab">' + chatRoomDTO.name + '</a>' +
         '</li>');
     $("#myTabContent").append('<div class = "tab-pane fade" id="currentChat_' + chatRoomDTO.id + '"></div>');
 
     $("#currentChat_" + chatRoomDTO.id).html(
-        '<div align="center" class="col-md-3">' +
+        '<div class = "container">' +
+        '<div class = "col-lg-5">' +
         '<label>' + chatRoomDTO.name + '</label>' +
-        '</br><textarea readonly id="correspondence_' + chatRoomDTO.id + '" rows="10" cols="50"></textarea>' +
-        '</br><div><input type="text" class = "form-control" id="messageArea_' + chatRoomDTO.id + '" align="left">' +
+        '</br>' +
+        '<textarea class = "form-control" style="background-color:white;" readonly id="correspondence_' + chatRoomDTO.id + '" rows="10"></textarea>' +
+        '</br>' +
+        '<div class = "input-group">' +
+        '<input type="text" class = "form-control" id="messageArea_' + chatRoomDTO.id + '">' +
         '<span class = "input-group-btn">' +
-        '<button class = "btn btn-default" type = "button" id="sendMessage_' + chatRoomDTO.id + '">Send</button></span></div>' +
-        '</br><input type="checkbox" id="private_' + chatRoomDTO.id + '" name="isPrivate" value=true>' +
-        '<label>send privately to: </label><div id="user-list_' + chatRoomDTO.id + '"></div></div>');
-    
+        '<button class = "btn btn-primary" type = "button" id="sendMessage_' + chatRoomDTO.id + '">Send</button>' +
+        '</span></div></br>' +
+        '<input type="checkbox" id="private_' + chatRoomDTO.id + '" name="isPrivate" value=true>' +
+        '<label>Send privately to: </label>' +
+        '<div id="user-list_' + chatRoomDTO.id + '">' +
+        '</div></div></div>');
+
     registerChat(eventBus, chatRoomDTO.id);
 
     eventBus.postMessage("CHAT_MESSAGES_UPDATE" + chatRoomDTO.id);
@@ -193,7 +206,7 @@ var showChatComp = function (eventbus, chatRoomDTO) {
 };
 
 var showUserList = function (divId, userList, chatRoomId) {
-    var listBox = '<select id="selectUser_' + chatRoomId + '">';
+    var listBox = '<select class="form-control" id="selectUser_' + chatRoomId + '">';
 
     for (var i = 0; i < Object.keys(userList).length; i++) {
         listBox += '<option value="' + userList[i].id + '">' + userList[i].firstName + '</option>';
@@ -205,7 +218,7 @@ var showUserList = function (divId, userList, chatRoomId) {
 
 var showChatList = function (eventBus, chatList) {
     var eventBus = eventBus;
-    var innerHTML = '<div id="chat-list" class="container"></div>';
+    var innerHTML = '<div class="container"><div id="chat-list" class ="col-lg-3"></div></div>';
     if (!document.getElementById("chat-list")) {
         $("#main-view").append(innerHTML);
     }
@@ -215,7 +228,8 @@ var showChatList = function (eventBus, chatList) {
             '<div id = "myTabContent" class = "tab-content"></div>');
     }
 
-    var listBox = '<select id="selectChat">';
+    var listBox = '<div class = "input-group">' +
+        '<select class="form-control" id="selectChat">';
 
     for (var i = 0; i < Object.keys(chatList).length; i++) {
         listBox += '<option value="' + chatList[i].id + '">' + chatList[i].name + '</option>';
@@ -224,8 +238,11 @@ var showChatList = function (eventBus, chatList) {
 
     $("#chat-list").html(
         '<label>Chat-rooms:</label>' + listBox +
-        '<button id="join" class = "btn btn-success btn-xs">Join</button>' +
-        '<button id="leave" class = "btn btn-danger btn-xs">Leave</button>');
+        '<span class = "input-group-btn">' +
+        '<button id="join" class = "btn btn-success">Join</button>' +
+        '<button id="leave" class = "btn btn-danger">Leave</button>' +
+        '</span></div>' +
+        '</br>');
 
     document.getElementById("join").onclick = function () {
         eventBus.postMessage("JOIN_TO_CHAT_ATTEMPT",
